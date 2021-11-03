@@ -1,0 +1,15 @@
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\obj\Debug\net5.0\Dicom.Application.csproj.AssemblyReference.cache
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\obj\Debug\net5.0\Dicom.Application.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\obj\Debug\net5.0\Dicom.Application.AssemblyInfoInputs.cache
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\obj\Debug\net5.0\Dicom.Application.AssemblyInfo.cs
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\obj\Debug\net5.0\Dicom.Application.csproj.CoreCompileInputs.cache
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\bin\Debug\net5.0\Dicom.Application.deps.json
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\bin\Debug\net5.0\Dicom.Application.dll
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\bin\Debug\net5.0\ref\Dicom.Application.dll
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\bin\Debug\net5.0\Dicom.Application.pdb
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\bin\Debug\net5.0\Dicom.Domain.dll
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\bin\Debug\net5.0\Dicom.Domain.pdb
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\obj\Debug\net5.0\Dicom.Application.csproj.CopyComplete
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\obj\Debug\net5.0\Dicom.Application.dll
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\obj\Debug\net5.0\ref\Dicom.Application.dll
+D:\Projects\Software\dic\backend\dicom\Dicom.Application\obj\Debug\net5.0\Dicom.Application.pdb

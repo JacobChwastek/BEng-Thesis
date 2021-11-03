@@ -1,0 +1,18 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+
+  .logo {
+    padding: 3%;
+  }
+
+  &__menu {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+  }
+
+  &__auth {
+    min-width: 10%;
+  }
+}

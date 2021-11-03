@@ -1,0 +1,15 @@
+.button-submit {
+  width: 100%;
+  background: #264653 !important;
+  border-radius: 20px !important;
+  min-height: 40px;
+  border: none !important;
+
+  &:hover {
+    background: #40768C !important;
+  }
+
+  span {
+    color: white !important;
+  }
+}

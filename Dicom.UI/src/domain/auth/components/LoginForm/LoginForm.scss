@@ -1,0 +1,53 @@
+.login {
+	width: 50%;
+	height: 60%;
+
+	display: flex;
+	flex-direction: column;
+
+	background: rgba(255, 255, 255, 0.1) !important;
+	backdrop-filter: blur(2.5px) !important;
+	-webkit-backdrop-filter: blur(2.5px) !important;
+	border-radius: 10px !important;
+	border: none !important;
+
+	.ant-card-head {
+		border: none;
+
+		.ant-card-head-title {
+			display: flex;
+			justify-content: center;
+
+			img {
+				min-width: 100px;
+				width: 10%;
+			}
+		}
+	}
+
+	.ant-card-body {
+		flex: 1;
+	}
+
+	&__form {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: space-evenly;
+	}
+
+	&__item {
+		width: 80%;
+		display: flex;
+		align-items: center;
+
+		.ant-form-item-control-input-content {
+			text-align: center;
+		}
+
+		.ant-col {
+			width: 100%;
+		}
+	}
+}

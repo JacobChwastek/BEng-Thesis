@@ -1,0 +1,92 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31515.178
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{E1F48336-78FC-4287-98F0-7131B1DFEE43}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "API", "API", "{B540A8C8-5F29-47A5-96AE-11F31E8F836D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dicom.API", "Dicom.API\Dicom.API\Dicom.API.csproj", "{D9AC15BF-6EDD-463C-9CBD-E9F01FB432EF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{8EA2B97E-E75C-4F1B-9C8E-6BCC668FFE39}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dicom.Application", "Dicom.Application\Dicom.Application.csproj", "{A4063958-9624-4D4F-AC4A-BD6A1FFF2664}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dicom.Domain", "Dicom.Domain\Dicom.Domain\Dicom.Domain.csproj", "{36A9ED4B-7E56-4A7A-B1AF-D8D84EBA9B9A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastucture", "Infrastucture", "{FDC88A00-1E49-4ABA-9FD2-FBE28892A8FE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dicom.Infrastructure", "Dicom.Infrastructure\Dicom.Infrastructure.csproj", "{B16F0640-5249-416B-BF79-E6D0D8D188FB}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dicom.Entity", "Dicom.Entity\Dicom.Entity.csproj", "{85CE3CD6-1D27-4DD3-B1C6-FA49B9CD7A24}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{98D5E0CF-A85A-4013-8B6A-BFC049609FBE}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Dicom.UI", "Dicom.UI\", "{61E5DA8D-A68A-44D7-8F06-3643C9FC46DB}"
+	ProjectSection(WebsiteProperties) = preProject
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/localhost_51261"
+		Debug.AspNetCompiler.PhysicalPath = "Dicom.UI\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_51261\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/localhost_51261"
+		Release.AspNetCompiler.PhysicalPath = "Dicom.UI\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_51261\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "51261"
+		SlnRelativePath = "Dicom.UI\"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D9AC15BF-6EDD-463C-9CBD-E9F01FB432EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9AC15BF-6EDD-463C-9CBD-E9F01FB432EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9AC15BF-6EDD-463C-9CBD-E9F01FB432EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9AC15BF-6EDD-463C-9CBD-E9F01FB432EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4063958-9624-4D4F-AC4A-BD6A1FFF2664}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4063958-9624-4D4F-AC4A-BD6A1FFF2664}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4063958-9624-4D4F-AC4A-BD6A1FFF2664}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4063958-9624-4D4F-AC4A-BD6A1FFF2664}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36A9ED4B-7E56-4A7A-B1AF-D8D84EBA9B9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36A9ED4B-7E56-4A7A-B1AF-D8D84EBA9B9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36A9ED4B-7E56-4A7A-B1AF-D8D84EBA9B9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36A9ED4B-7E56-4A7A-B1AF-D8D84EBA9B9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B16F0640-5249-416B-BF79-E6D0D8D188FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B16F0640-5249-416B-BF79-E6D0D8D188FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B16F0640-5249-416B-BF79-E6D0D8D188FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B16F0640-5249-416B-BF79-E6D0D8D188FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85CE3CD6-1D27-4DD3-B1C6-FA49B9CD7A24}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85CE3CD6-1D27-4DD3-B1C6-FA49B9CD7A24}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85CE3CD6-1D27-4DD3-B1C6-FA49B9CD7A24}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85CE3CD6-1D27-4DD3-B1C6-FA49B9CD7A24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61E5DA8D-A68A-44D7-8F06-3643C9FC46DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61E5DA8D-A68A-44D7-8F06-3643C9FC46DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61E5DA8D-A68A-44D7-8F06-3643C9FC46DB}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{61E5DA8D-A68A-44D7-8F06-3643C9FC46DB}.Release|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D9AC15BF-6EDD-463C-9CBD-E9F01FB432EF} = {B540A8C8-5F29-47A5-96AE-11F31E8F836D}
+		{A4063958-9624-4D4F-AC4A-BD6A1FFF2664} = {8EA2B97E-E75C-4F1B-9C8E-6BCC668FFE39}
+		{36A9ED4B-7E56-4A7A-B1AF-D8D84EBA9B9A} = {E1F48336-78FC-4287-98F0-7131B1DFEE43}
+		{B16F0640-5249-416B-BF79-E6D0D8D188FB} = {FDC88A00-1E49-4ABA-9FD2-FBE28892A8FE}
+		{85CE3CD6-1D27-4DD3-B1C6-FA49B9CD7A24} = {FDC88A00-1E49-4ABA-9FD2-FBE28892A8FE}
+		{61E5DA8D-A68A-44D7-8F06-3643C9FC46DB} = {98D5E0CF-A85A-4013-8B6A-BFC049609FBE}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {946EA51F-329F-4165-99B5-E3523332E938}
+	EndGlobalSection
+EndGlobal

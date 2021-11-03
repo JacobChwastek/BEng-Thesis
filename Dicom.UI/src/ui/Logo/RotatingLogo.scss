@@ -1,0 +1,12 @@
+.rotating-logo {
+	display: flex;
+	justify-content: center;
+
+	&__image {
+		transition: transform 0.7s ease-in-out;
+
+		&:hover {
+			transform: rotate(360deg);
+		}
+	}
+}

@@ -1,0 +1,21 @@
+.input, .ant-input {
+	outline: none;
+	width: 100%;
+	min-height: 40px;
+	border-radius: 1px;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	font-size: 1.35rem;
+	border: 1px solid #fff;
+	padding: 0 2.5em 0 0.5em;
+	background: none;
+
+	&:hover {
+		outline: none;
+	}
+
+	&--outline {
+		color: white;
+		background: none;
+	}
+}
