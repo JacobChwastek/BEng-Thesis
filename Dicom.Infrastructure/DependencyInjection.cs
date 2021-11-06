@@ -1,7 +1,6 @@
-﻿using Dicom.Application.Common.Interfaces;
+﻿//using Dicom.Application.Common.Interfaces;
 using Dicom.Infrastructure.Persistence;
 using Dicom.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dicom.Infrastructure
@@ -10,8 +9,7 @@ namespace Dicom.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-
-            services.AddTransient<IIdentity, UserRepository>();
+            services.AddScoped<DicomRepositories>();
             services.AddDbContext<Context>();
 
             return services;

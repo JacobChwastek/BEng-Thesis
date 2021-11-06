@@ -1,28 +1,28 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using Dicom.Application.Common.Interfaces;
 using Dicom.Application.Responses;
-using Dicom.Domain.Entities;
+using Dicom.Entity.Identity;
+using Dicom.Infrastructure.Repositories;
 using MediatR;
 
 namespace Dicom.Application.Queries
 {
     public class UserInfoQueryHandler : IRequestHandler<UserInfoQuery, UserInfoQueryResponse>
     {
-        private readonly IIdentity _identity;
+        private readonly DicomRepositories _dal;
         private readonly IMapper _mapper;
 
-        public UserInfoQueryHandler(IIdentity identity, IMapper mapper)
+        public UserInfoQueryHandler(IMapper mapper, DicomRepositories dal)
         {
-            _identity = identity;
             _mapper = mapper;
+            _dal = dal;
         }
 
         public async Task<UserInfoQueryResponse> Handle(UserInfoQuery request, CancellationToken cancellationToken)
         {
-            /* Just for testing only**/
-            var result = await _identity.FindUserByIdAsync(request.UserId);
+            var result = await _dal.UserRepositoryAsync.GetByIDAsync(request.UserId);
+
             return result != null ? _mapper.Map<User, UserInfoQueryResponse>(result) : new UserInfoQueryResponse();
         }
     }

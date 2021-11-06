@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="EntityTypeConfiguration\Identity\" />
     <Folder Include="Persistence\Migrations\" />
     <Folder Include="Persistence\Seed\" />
   </ItemGroup>
@@ -26,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Dicom.Application\Dicom.Application.csproj" />
     <ProjectReference Include="..\Dicom.Entity\Dicom.Entity.csproj" />
   </ItemGroup>
 

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using Dicom.Application.Commands;
 using Dicom.Application.Queries;
@@ -30,9 +31,9 @@ namespace Dicom.API.Controllers
         [HttpGet("get-user/{userid}")]
         [Authorize]
         public async Task<IActionResult>
-            FindUserByIdAsync([FromRoute] string userid)
+            FindUserByIdAsync([FromRoute] Guid userId)
         {
-            var result = await Mediator.Send(new UserInfoQuery { UserId = userid });
+            var result = await Mediator.Send(new UserInfoQuery { UserId = userId });
             return result != null ? Ok(result) : (IActionResult)NotFound();
         }
     }

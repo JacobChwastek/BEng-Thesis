@@ -9,24 +9,25 @@ using Dicom.Application.Commands;
 using Dicom.Application.Common.Interfaces;
 using Dicom.Application.Options;
 using Dicom.Application.Responses;
-using Dicom.Domain.Entities;
+using Dicom.Entity.Identity;
+using Dicom.Infrastructure.Repositories;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Dicom.Application.Services
 {
     public class AuthenticationService : IAuthentication
     {
-        private readonly IIdentity _identity;
+        private readonly DicomRepositories _dal;
         private readonly JwtSettings _jwtSettings;
-        public AuthenticationService(IIdentity identity, JwtSettings jwtSettings)
+        public AuthenticationService(JwtSettings jwtSettings, DicomRepositories dal)
         {
-            _identity = identity;
             _jwtSettings = jwtSettings;
+            _dal = dal;
         }
 
         public async Task<AuthenticationResponse> LoginAsync(LoginCommand user)
         {
-            var existingUser = await _identity.FindUserByIdAsync(user.UserId);
+            var existingUser = await _dal.UserRepositoryAsync.GetByIDAsync(user.UserId);
 
             if (existingUser == null)
             {
@@ -49,7 +50,7 @@ namespace Dicom.Application.Services
 
         public async Task<AuthenticationResponse> RegisterAsync(CreateUserCommand user)
         {
-            var existingUser = await _identity.FindUserByIdAsync(user.UserId);
+            var existingUser = await _dal.UserRepositoryAsync.GetByIDAsync(user.UserId);
 
             if (existingUser != null)
             {
@@ -61,10 +62,16 @@ namespace Dicom.Application.Services
 
             var (password, salt) = GenerateHashPasswordAndSalt(password: user.Password);
 
-            var result = await _identity
-                .CreateUserAsync(new User { Id = user.UserId, Password = password, Salt = salt, Role = user.Role });
+            var role = new Role()
+            {
+                Id = Guid.NewGuid(),
+                Name = user.Role
+            };
 
-            if (!result)
+            var result = await _dal.UserRepositoryAsync.InsertAsync(new User
+                { Id = user.UserId, Password = password, Salt = salt, Role = role });
+
+            if (!result.HasValue)
             {
                 return new AuthenticationResponse
                 {
@@ -72,7 +79,7 @@ namespace Dicom.Application.Services
                 };
             }
 
-            var newUser = await _identity.FindUserByIdAsync(user.UserId);
+            var newUser = await _dal.UserRepositoryAsync.GetByIDAsync(user.UserId);
 
             return await GenerateAuthenticationResponseForUserAsync(newUser);
         }
@@ -89,10 +96,10 @@ namespace Dicom.Application.Services
 
             var claims = new List<Claim>
             {
-               new Claim(ClaimTypes.Role, user.Role),
+               new Claim(ClaimTypes.Role, user.Role.Name),
                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                new Claim("id", user.Id.ToString()),
-               new Claim("userId", user.Id)
+               new Claim("userId", user.Id.ToString())
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor

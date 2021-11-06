@@ -5,7 +5,7 @@ namespace Dicom.Infrastructure.Persistence
 {
     public class Context: DbContext
     {
-        private string GetConnectionString() => ConfigurationConstants.DBConnectionString;
+        private static string GetConnectionString() => ConfigurationConstants.DBConnectionString;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseNpgsql(GetConnectionString());
