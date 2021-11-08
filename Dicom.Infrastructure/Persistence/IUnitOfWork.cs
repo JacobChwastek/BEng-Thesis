@@ -4,7 +4,7 @@ namespace Dicom.Infrastructure.Persistence
 {
     public interface IUnitOfWork
     {
-        Task SaveChangesAsync();
+        Task<int> SaveChangesAsync();
         void SaveChanges();
     }
 }

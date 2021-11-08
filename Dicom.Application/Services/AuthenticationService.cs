@@ -10,7 +10,9 @@ using Dicom.Application.Common.Interfaces;
 using Dicom.Application.Options;
 using Dicom.Application.Responses;
 using Dicom.Entity.Identity;
+using Dicom.Infrastructure.Persistence;
 using Dicom.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Dicom.Application.Services
@@ -19,15 +21,17 @@ namespace Dicom.Application.Services
     {
         private readonly DicomRepositories _dal;
         private readonly JwtSettings _jwtSettings;
-        public AuthenticationService(JwtSettings jwtSettings, DicomRepositories dal)
+        private readonly IUnitOfWork _unitOfWork;
+        public AuthenticationService(JwtSettings jwtSettings, DicomRepositories dal, IUnitOfWork unitOfWork)
         {
             _jwtSettings = jwtSettings;
             _dal = dal;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<AuthenticationResponse> LoginAsync(LoginCommand user)
         {
-            var existingUser = await _dal.UserRepositoryAsync.GetByIDAsync(user.UserId);
+            var existingUser = await _dal.UserRepositoryAsync.GetQuerable(x => x.Email == user.Email).Include(x => x.Role).FirstOrDefaultAsync();
 
             if (existingUser == null)
             {
@@ -37,7 +41,7 @@ namespace Dicom.Application.Services
                 };
             }
 
-            if (CheckPasswordAsync(existingUser.Password, existingUser.Salt, user.Password))
+            if (!CheckPasswordAsync(existingUser.Password, existingUser.Salt, user.Password))
             {
                 return new AuthenticationResponse
                 {
@@ -50,7 +54,7 @@ namespace Dicom.Application.Services
 
         public async Task<AuthenticationResponse> RegisterAsync(CreateUserCommand user)
         {
-            var existingUser = await _dal.UserRepositoryAsync.GetAsync(x => x.Email == user.Email);
+            var existingUser = await _dal.UserRepositoryAsync.FirstOrDefaultAsync(x => x.Email == user.Email);
 
             if (existingUser != null)
             {
@@ -62,15 +66,23 @@ namespace Dicom.Application.Services
 
             var (password, salt) = GenerateHashPasswordAndSalt(password: user.Password);
 
-            var role = new Role()
-            {
-                Id = Guid.NewGuid(),
-                Name = RoleNames.User
-            };
+            var role = await _dal.RoleRepositoryAsync.FirstAsync(x => x.Name == RoleNames.User);
 
             var userId = Guid.NewGuid();
-            var result = await _dal.UserRepositoryAsync.InsertAsync(new User
-                { Id = userId, Password = password, Salt = salt, Role = role });
+            var result = await _dal.UserRepositoryAsync.InsertAsync(
+                new User
+                {
+                    Id = userId, 
+                    Password = password, 
+                    Salt = salt, 
+                    Role = role,
+                    RoleId = role.Id,
+                    CreatedAt = DateTime.Now,
+                    Email = user.Email,
+                    FirstName = "",
+                    LastName = "",
+                    PhoneNumber = ""
+                });
 
             if (!result.HasValue)
             {
@@ -81,19 +93,18 @@ namespace Dicom.Application.Services
             }
 
             var newUser = await _dal.UserRepositoryAsync.GetByIDAsync(userId);
+            await _dal.UserRepositoryAsync.SaveChangesAsync();
 
             return await GenerateAuthenticationResponseForUserAsync(newUser);
         }
 
-        private static bool CheckPasswordAsync(string hashPassword, string salt, string password)
-        {
-            return HashVerify.VerifyHashString(hashPassword, salt, password);
-        }
+        private static bool CheckPasswordAsync(string hashPassword, string salt, string password) => HashVerify.VerifyHashString(hashPassword, salt, password);
+        
 
         private Task<AuthenticationResponse> GenerateAuthenticationResponseForUserAsync(User user)
         {
             var jwtHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
+            var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret); 
 
             var claims = new List<Claim>
             {

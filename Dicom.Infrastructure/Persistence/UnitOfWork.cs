@@ -11,9 +11,9 @@ namespace Dicom.Infrastructure.Persistence
             _context = context;
         }
 
-        public Task SaveChangesAsync()
+        public async Task<int> SaveChangesAsync()
         {
-            return _context.SaveChangesAsync();
+            return await _context.SaveChangesAsync();
         }
 
         public void SaveChanges()

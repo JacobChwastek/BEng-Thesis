@@ -10,6 +10,7 @@ namespace Dicom.Infrastructure
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
             services.AddScoped<DicomRepositories>();
+            services.AddTransient<IUnitOfWork,UnitOfWork>() ;
             services.AddDbContext<Context>();
 
             return services;

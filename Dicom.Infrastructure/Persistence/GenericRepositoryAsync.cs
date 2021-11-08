@@ -12,12 +12,19 @@ namespace Dicom.Infrastructure.Persistence
     {
         internal Context context;
         internal DbSet<TEntity> dbSet;
+        internal IUnitOfWork _unitOfWork;
 
         protected GenericRepositoryAsync() { }
 
         public GenericRepositoryAsync(Context context)
         {
+            SetContext(context);
+        }
+
+        public void SetContext(Context context)   // a workaround for creating custom repos in DAL.cs
+        {
             this.context = context;
+            this.dbSet = context.Set<TEntity>();
         }
 
 
@@ -30,6 +37,40 @@ namespace Dicom.Infrastructure.Persistence
                 ? await dbSet.FindAsync(id)
                 : await dbSet.AsNoTracking().SingleOrDefaultAsync(ent => ent.Id == id);
         }
+
+        public async Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter = null)
+        {
+            if (filter is null)
+                filter = (x) => true;
+
+            return await dbSet.FirstOrDefaultAsync(filter);
+        }
+
+        public async Task<TEntity> FirstAsync(Expression<Func<TEntity, bool>> filter = null)
+        {
+            if (filter is null)
+                filter = (x) => true;
+
+            return await dbSet.FirstAsync(filter);
+        }
+
+        public async Task<TEntity> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> filter = null, QueryTrackingBehavior behavior = QueryTrackingBehavior.TrackAll)
+        {
+            if (filter is null)
+                filter = (x) => true;
+
+            if (behavior == QueryTrackingBehavior.TrackAll)
+            {
+                return await dbSet.SingleOrDefaultAsync(filter);
+            }
+            else
+            {
+                return await dbSet.AsNoTracking().SingleOrDefaultAsync(filter);
+            }
+        }
+
+
+
 
         public IQueryable<TEntity> GetAllQueryable()
         {
@@ -194,5 +235,10 @@ namespace Dicom.Infrastructure.Persistence
         }
 
         #endregion
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await this.context.SaveChangesAsync();
+        }
     }
 }

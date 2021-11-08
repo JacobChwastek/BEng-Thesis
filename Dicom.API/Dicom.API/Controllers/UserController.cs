@@ -12,7 +12,6 @@ namespace Dicom.API.Controllers
     public class UserController : ApiController
     {
         [HttpPost("create-user")]
-        [Authorize]
         public async Task<IActionResult>
             CreateUserAsync([FromBody] CreateUserCommand createUser)
         {

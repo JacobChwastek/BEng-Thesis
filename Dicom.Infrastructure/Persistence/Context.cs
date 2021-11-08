@@ -2,6 +2,8 @@
 using Dicom.Infrastructure.Common;
 using Dicom.Infrastructure.EntityTypeConfiguration.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace Dicom.Infrastructure.Persistence
 {
@@ -12,6 +14,7 @@ namespace Dicom.Infrastructure.Persistence
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder
                 .UseNpgsql(GetConnectionString())
+                .UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()))
                 .UseSnakeCaseNamingConvention();
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -23,5 +26,8 @@ namespace Dicom.Infrastructure.Persistence
             //roles
             new RoleEntityTypeConfiguration().Configure(builder.Entity<Role>());
         }
+
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
     }
 }

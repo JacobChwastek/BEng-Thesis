@@ -14,7 +14,7 @@ namespace Dicom.Infrastructure.EntityTypeConfiguration.Identity
 
             builder.HasIndex(x => x.Email).IsUnique();
 
-            builder.Property(x => x.Password).HasMaxLength(40);
+            builder.Property(x => x.Password).HasMaxLength(200);
             
             builder.Property(x => x.Email).HasMaxLength(40);
 

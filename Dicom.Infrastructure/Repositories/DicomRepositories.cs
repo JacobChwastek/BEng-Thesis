@@ -30,6 +30,11 @@ namespace Dicom.Infrastructure.Repositories
 
     public class DicomRepositories: DAL
     {
+        public DicomRepositories() : base()
+        {
+
+        }
         public GenericRepositoryAsync<User> UserRepositoryAsync => base.RepositoryAsync<User>();
+        public GenericRepositoryAsync<Role> RoleRepositoryAsync => base.RepositoryAsync<Role>();
     }
 }

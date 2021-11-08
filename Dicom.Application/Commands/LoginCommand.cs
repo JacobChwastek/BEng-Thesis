@@ -6,7 +6,7 @@ namespace Dicom.Application.Commands
 {
     public class LoginCommand : IRequest<AuthenticationResponse>
     {
-        public Guid UserId { get; set; }
+        public string Email { get; set; }
         public string Password { get; set; }
     }
 }
