@@ -50,7 +50,7 @@ namespace Dicom.Application.Services
 
         public async Task<AuthenticationResponse> RegisterAsync(CreateUserCommand user)
         {
-            var existingUser = await _dal.UserRepositoryAsync.GetByIDAsync(user.UserId);
+            var existingUser = await _dal.UserRepositoryAsync.GetAsync(x => x.Email == user.Email);
 
             if (existingUser != null)
             {
@@ -65,11 +65,12 @@ namespace Dicom.Application.Services
             var role = new Role()
             {
                 Id = Guid.NewGuid(),
-                Name = user.Role
+                Name = RoleNames.User
             };
 
+            var userId = Guid.NewGuid();
             var result = await _dal.UserRepositoryAsync.InsertAsync(new User
-                { Id = user.UserId, Password = password, Salt = salt, Role = role });
+                { Id = userId, Password = password, Salt = salt, Role = role });
 
             if (!result.HasValue)
             {
@@ -79,7 +80,7 @@ namespace Dicom.Application.Services
                 };
             }
 
-            var newUser = await _dal.UserRepositoryAsync.GetByIDAsync(user.UserId);
+            var newUser = await _dal.UserRepositoryAsync.GetByIDAsync(userId);
 
             return await GenerateAuthenticationResponseForUserAsync(newUser);
         }

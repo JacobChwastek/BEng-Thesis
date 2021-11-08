@@ -11,4 +11,11 @@ namespace Dicom.Entity.Identity
 
         public ICollection<User> Users { get; set; }
     }
+
+    public static class RoleNames
+    {
+        public static string Admin = "Admin";
+
+        public static string User = "User";
+    }
 }
