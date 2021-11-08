@@ -1,4 +1,5 @@
 ﻿using Dicom.Entity.Identity;
+using Dicom.Infrastructure.Persistence.Seed;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -13,6 +14,8 @@ namespace Dicom.Infrastructure.EntityTypeConfiguration.Identity
             builder.HasKey(x => x.Id);
 
             builder.HasIndex(x => x.Name).IsUnique();
+
+            builder.HasData(RoleSeedDev.RoleSeed);
         }
     }
 }
