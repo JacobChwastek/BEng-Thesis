@@ -1,10 +1,13 @@
-import { configureStore } from "@reduxjs/toolkit";
-import { authSlice } from 'domain/auth/store/authSlice'
+import {configureStore} from "@reduxjs/toolkit";
+import {authSlice} from 'domain/auth/store/authSlice'
+import {baseAPI as api} from 'infrastructure/persistance/api'
+
 
 export const store = configureStore({
-  reducer: {
-    auth: authSlice.reducer
-  },
+    reducer: {
+        [api.reducerPath]: api.reducer,
+        auth: authSlice.reducer
+    },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

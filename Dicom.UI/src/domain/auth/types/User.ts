@@ -1,11 +1,13 @@
 export interface IUser {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  // accountSettings: IAccountSettings;
-  role: string;
+  id: string,
+  email: string,
+  firstName: string,
+  lastName: string,
+  phoneNumber: string,
+  role: {
+    id: string,
+    name: string
+  } | null
 }
 
 export const DEFAULT_USER: IUser = {
@@ -13,11 +15,7 @@ export const DEFAULT_USER: IUser = {
   firstName: "",
   id: "",
   lastName: "",
-  password: "",
-  role: ""
-  // accountSettings: {
-  //   id: "",
-  //   isConfirmed: false,
-  //   registrationStep: 0,
-  // },
+  phoneNumber: "",
+  role: null
 };
+

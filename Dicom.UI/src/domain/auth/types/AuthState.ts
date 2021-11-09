@@ -6,4 +6,5 @@ export interface IAuthState {
   user: IUser;
   isLoading: boolean;
   error: IAuthError;
+  token?: string
 }

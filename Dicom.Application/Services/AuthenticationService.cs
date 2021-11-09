@@ -93,7 +93,15 @@ namespace Dicom.Application.Services
             }
 
             var newUser = await _dal.UserRepositoryAsync.GetByIDAsync(userId);
-            await _dal.UserRepositoryAsync.SaveChangesAsync();
+            var status = await _dal.UserRepositoryAsync.SaveChangesAsync();
+
+            if (status == 0)
+            {
+                return new AuthenticationResponse
+                {
+                    Errors = new[] { "Unable to create user" }
+                };
+            }
 
             return await GenerateAuthenticationResponseForUserAsync(newUser);
         }
@@ -111,7 +119,8 @@ namespace Dicom.Application.Services
                new Claim(ClaimTypes.Role, user.Role.Name),
                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                new Claim("id", user.Id.ToString()),
-               new Claim("userId", user.Id.ToString())
+               new Claim(ClaimTypes.UserData, user.Id.ToString()),
+               new Claim(ClaimTypes.Email, user.Email)
             };
 
             var tokenDescriptor = new SecurityTokenDescriptor

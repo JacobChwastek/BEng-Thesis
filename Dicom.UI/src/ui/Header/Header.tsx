@@ -10,6 +10,7 @@ import { setLogOut } from "domain/auth/store/authSlice";
 
 type Props = {
 	isAuth: boolean;
+
 };
 
 const { Header: AHeader } = ALayout;
