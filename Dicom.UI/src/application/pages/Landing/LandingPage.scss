@@ -1,0 +1,40 @@
+.landing-page {
+  height: 100%;
+  background-color: #1D3557;
+  display: flex;
+  flex-direction: column;
+
+
+  &__header {
+    display: flex;
+    width: 100%;
+    min-height: 56px;
+    max-height: 5%;
+    margin: 1%;
+  }
+
+  &__button {
+    border-radius: 20%;
+    background-color: red;
+  }
+
+  &__left, &__middle, &__right {
+    flex: 1;
+    display: flex;
+  }
+
+  &__left {
+    display: flex;
+    justify-content: end;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+  }
+
+  &__content {
+    height: 95%;
+  }
+}
