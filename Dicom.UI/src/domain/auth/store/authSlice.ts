@@ -1,13 +1,12 @@
-import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {IAuthState} from "domain/auth/types/AuthState";
-import {DEFAULT_USER, IUser} from "domain/auth/types/User";
-import {AuthResponse} from "./api";
-import {localStore} from 'infrastructure/persistance/storage'
-// import { RootState } from "../store";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { IAuthState } from "domain/auth/types/AuthState";
+import { DEFAULT_USER, IUser } from "domain/auth/types/User";
+import { AuthResponse } from "./api";
+import { localStore } from "infrastructure/persistance/storage";
 
 export const initialState: IAuthState = {
     isAuth: Boolean(localStore.getItem("token")),
-    error: {message: "", code: 200},
+    error: { message: "", code: 200 },
     isLoading: false,
     user: DEFAULT_USER,
     token: localStore.getItem("token") || undefined

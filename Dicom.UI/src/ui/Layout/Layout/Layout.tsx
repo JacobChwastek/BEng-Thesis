@@ -46,7 +46,7 @@ export const Layout = ({ children, isAuth, role, contentWrapper = true }: Props)
 		<ALayout className="layout">
 			<Header isAuth={isAuth} />
 			<ALayout>
-				<Sider width={200} className="layout__sider">
+				<Sider collapsible width={200} className="layout__sider">
 					<Menu
 						className="sider_menu"
 						mode="inline"
@@ -65,12 +65,12 @@ export const Layout = ({ children, isAuth, role, contentWrapper = true }: Props)
 						</Menu.Item>
 					</Menu>
 				</Sider>
-				<ALayout className="content-container">
-					{
-						contentWrapper ?
-							<Content className="content-container__content">{children}</Content> : <>{children}</>
-					}
-				</ALayout>
+				{contentWrapper ?
+					<ALayout className="content-container">
+						<Content className="content-container__content">{children}</Content>
+					</ALayout> :
+					<>{children}</>
+				}
 			</ALayout>
 		</ALayout>
 	);

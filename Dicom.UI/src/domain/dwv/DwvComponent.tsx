@@ -1,23 +1,30 @@
 import React from "react";
-import PropTypes from "prop-types";
+import { connect, ConnectedProps } from "react-redux";
 import { withStyles } from "@material-ui/core/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import MenuItem from "@material-ui/core/MenuItem";
-import Slide from "@material-ui/core/Slide";
 import { Tools } from "./DwvTools/Tools";
+
+// @ts-ignore
 import dwv from "dwv";
 
 import "./DwvComponent.css";
-
+import {
+	setDataLoaded,
+	setLoadProgress,
+	setMetaData,
+	setSelectedTool,
+	setShowDicomTags,
+	setToolMenuAnchorEl,
+	setToolNames
+} from "domain/dwv/store/dicomSlice";
+import { RootState } from "application/store/store";
 
 
 // get element
 dwv.gui.getElement = dwv.gui.base.getElement;
 
-// prompt
-// (no direct assign to avoid Illegal invocation error
-// see: https://stackoverflow.com/questions/9677985/uncaught-typeerror-illegal-invocation-in-chrome)
-dwv.gui.prompt = function(message, def) {
+dwv.gui.prompt = function(message: any, def: any) {
 	return prompt(message, def);
 };
 
@@ -29,7 +36,7 @@ dwv.image.decoderScripts = {
 	"rle": `${process.env.PUBLIC_URL}/assets/dwv/decoders/dwv/decode-rle.js`
 };
 
-const styles = theme => ({
+const styles: any = (theme: any) => ({
 	button: {
 		margin: theme.spacing(1)
 	},
@@ -48,47 +55,44 @@ const styles = theme => ({
 	}
 });
 
-export const TransitionUp = React.forwardRef((props, ref) => (
-	<Slide direction="up" {...props} ref={ref} />
-));
+type Props = ConnectedProps<typeof connector> & {
+	onFileUpload: (fileName: string, fileSize: number) => void;
+	classes?: any;
+}
+type State = {
+	dwvApp: any
+}
 
-class DwvComponent extends React.Component {
-	constructor(props) {
+class DwvComponent extends React.Component<Props, State> {
+
+	constructor(props: Props) {
 		super(props);
+
 		this.state = {
-			versions: {
-				dwv: dwv.getVersion(),
-				react: React.version
-			},
-			tools: {
-				Scroll: {},
-				ZoomAndPan: {},
-				WindowLevel: {},
-				Draw: {
-					options: ["Ruler"],
-					type: "factory",
-					events: ["drawcreate", "drawchange", "drawmove", "drawdelete"]
-				}
-			},
-			toolNames: [],
-			selectedTool: "Select Tool",
-			loadProgress: 0,
-			dataLoaded: false,
-			dwvApp: null,
-			metaData: [],
-			showDicomTags: false,
-			toolMenuAnchorEl: null,
-			dropboxClassName: "dropBox",
-			borderClassName: "dropBoxBorder",
-			hoverClassName: "hover"
+			dwvApp: null
 		};
 	}
 
 	render() {
-		const { classes } = this.props;
-		const { versions, tools, toolNames, loadProgress, dataLoaded, metaData, toolMenuAnchorEl } = this.state;
+		const {
+			classes,
+			dicom: {
+				versions,
+				tools,
+				toolNames,
+				loadProgress,
+				showDicomTags,
+				selectedTool,
+				dataLoaded,
+				metaData,
+				toolMenuAnchorEl
+			}
+		} = this.props;
 
-		const toolsMenuItems = toolNames.map((tool) =>
+		if (toolNames === undefined)
+			return <></>;
+
+		const toolsMenuItems = toolNames.map((tool: string) =>
 			<MenuItem onClick={this.handleMenuItemClick.bind(this, tool)} key={tool} value={tool}>{tool}</MenuItem>
 		);
 
@@ -98,8 +102,8 @@ class DwvComponent extends React.Component {
 				<Tools
 					toolMenuAnchorEl={toolMenuAnchorEl}
 					isDataLoaded={dataLoaded}
-					isTagModalVisible={this.state.showDicomTags}
-					selectedTool={this.state.selectedTool}
+					isTagModalVisible={showDicomTags}
+					selectedTool={selectedTool}
 					metaData={metaData}
 					onToolClick={this.handleMenuButtonClick}
 					onReset={this.onReset}
@@ -123,14 +127,14 @@ class DwvComponent extends React.Component {
 		// initialise app
 		app.init({
 			"containerDivId": "dwv",
-			"tools": this.state.tools
+			"tools": this.props.dicom.tools
 		});
 
 		// load events
-		let nLoadItem = null;
-		let nReceivedError = null;
-		let nReceivedAbort = null;
-		app.addEventListener("loadstart", (/*event*/) => {
+		let nLoadItem: number | null = null;
+		let nReceivedError: number | null = null;
+		let nReceivedAbort: number | null = null;
+		app.addEventListener("loadstart", () => {
 			// reset flags
 			nLoadItem = 0;
 			nReceivedError = 0;
@@ -138,22 +142,25 @@ class DwvComponent extends React.Component {
 			// hide drop box
 			this.showDropbox(app, false);
 		});
-		app.addEventListener("loadprogress", (event) => {
-			this.setState({ loadProgress: event.loaded });
+
+		app.addEventListener("loadprogress", (event: any) => {
+			this.props.setLoadProgress(event.loaded);
 		});
-		app.addEventListener("load", (/*event*/) => {
+
+		app.addEventListener("load", () => {
 			// set dicom tags
-			this.setState({ metaData: dwv.utils.objectToArray(app.getMetaData()) });
+			this.props.setMetaData(dwv.utils.objectToArray(app.getMetaData()));
 			// available tools
 			let names = [];
-			for (const key in this.state.tools) {
+			for (const key in this.props.dicom.tools) {
 				if ((key === "Scroll" && app.canScroll()) ||
 					(key === "WindowLevel" && app.canWindowLevel()) ||
 					(key !== "Scroll" && key !== "WindowLevel")) {
 					names.push(key);
 				}
 			}
-			this.setState({ toolNames: names });
+			console.log(names);
+			this.props.setToolNames(names);
 			this.onChangeTool(names[0]);
 			// set the selected tool
 			let selectedTool = "Scroll";
@@ -162,11 +169,12 @@ class DwvComponent extends React.Component {
 			}
 			this.onChangeTool(selectedTool);
 			// set data loaded flag
-			this.setState({ dataLoaded: true });
+			this.props.setDataLoaded(true);
 		});
+
 		app.addEventListener("loadend", (/*event*/) => {
 			if (nReceivedError) {
-				this.setState({ loadProgress: 0 });
+				this.props.setLoadProgress(0);
 				alert("Received errors during load. Check log for details.");
 				// show drop box if nothing has been loaded
 				if (!nLoadItem) {
@@ -174,26 +182,32 @@ class DwvComponent extends React.Component {
 				}
 			}
 			if (nReceivedAbort) {
-				this.setState({ loadProgress: 0 });
+				this.props.setLoadProgress(0);
 				alert("Load was aborted.");
 				this.showDropbox(app, true);
 			}
 		});
-		app.addEventListener("loaditem", (/*event*/) => {
-			++nLoadItem;
+
+		app.addEventListener("loaditem", () => {
+			nLoadItem && ++nLoadItem;
+
 		});
-		app.addEventListener("error", (event) => {
+
+		app.addEventListener("error", (event: any) => {
 			console.error(event.error);
-			++nReceivedError;
+			nReceivedError && ++nReceivedError;
+
 		});
+
 		app.addEventListener("abort", (/*event*/) => {
-			++nReceivedAbort;
+			nReceivedAbort && ++nReceivedAbort;
 		});
 
 		// handle key events
-		app.addEventListener("keydown", (event) => {
+		app.addEventListener("keydown", (event: any) => {
 			app.defaultOnKeydown(event);
 		});
+
 		// handle window resize
 		window.addEventListener("resize", app.onResize);
 
@@ -213,10 +227,10 @@ class DwvComponent extends React.Component {
 	 */
 	onChangeTool = (tool: string) => {
 		if (this.state.dwvApp) {
-			this.setState({ selectedTool: tool });
+			this.props.setSelectedTool(tool);
 			this.state.dwvApp.setTool(tool);
 			if (tool === "Draw") {
-				this.onChangeShape(this.state.tools.Draw.options[0]);
+				this.onChangeShape(this.props.dicom.tools.Draw.options[0]);
 			}
 		}
 	};
@@ -225,7 +239,7 @@ class DwvComponent extends React.Component {
 	 * Handle a change draw shape event.
 	 * @param shape The new shape name.
 	 */
-	onChangeShape = (shape: string) => {
+	onChangeShape = (shape: any) => {
 		if (this.state.dwvApp) {
 			this.state.dwvApp.setDrawShape(shape);
 		}
@@ -234,7 +248,7 @@ class DwvComponent extends React.Component {
 	/**
 	 * Handle a reset event.
 	 */
-	onReset = tool => {
+	onReset = () => {
 		if (this.state.dwvApp) {
 			this.state.dwvApp.resetDisplay();
 		}
@@ -244,35 +258,35 @@ class DwvComponent extends React.Component {
 	 * Open the DICOM tags dialog.
 	 */
 	handleTagsDialogOpen = () => {
-		this.setState({ showDicomTags: true });
+		this.props.setShowDicomTags(true);
 	};
 
 	/**
 	 * Close the DICOM tags dialog.
 	 */
 	handleTagsDialogClose = () => {
-		this.setState({ showDicomTags: false });
+		this.props.setShowDicomTags(false);
 	};
 
 	/**
 	 * Menu button click.
 	 */
-	handleMenuButtonClick = event => {
-		this.setState({ toolMenuAnchorEl: event.currentTarget });
+	handleMenuButtonClick = (event: any) => {
+		this.props.setToolMenuAnchorEl(event.currentTarget);
 	};
 
 	/**
 	 * Menu cloase.
 	 */
-	handleMenuClose = event => {
-		this.setState({ toolMenuAnchorEl: null });
+	handleMenuClose = (event: any) => {
+		this.props.setToolMenuAnchorEl(null);
 	};
 
 	/**
 	 * Menu item click.
 	 */
-	handleMenuItemClick = tool => {
-		this.setState({ toolMenuAnchorEl: null });
+	handleMenuItemClick = (tool: string) => {
+		this.props.setToolMenuAnchorEl(null);
 		this.onChangeTool(tool);
 	};
 
@@ -281,7 +295,7 @@ class DwvComponent extends React.Component {
 	/**
 	 * Setup the data load drop box: add event listeners and set initial size.
 	 */
-	setupDropbox = (app) => {
+	setupDropbox = (app: any) => {
 		// start listening to drag events on the layer container
 		const layerContainer = app.getElement("layerContainer");
 		if (layerContainer) {
@@ -298,14 +312,14 @@ class DwvComponent extends React.Component {
 	 * Handle a drag over.
 	 * @param event The event to handle.
 	 */
-	onDragOver = (event: DragEvent) => {
+	onDragOver = (event: any) => {
 		// prevent default handling
 		event.stopPropagation();
 		event.preventDefault();
 		// update box border
-		const box = this.state.dwvApp.getElement(this.state.borderClassName);
-		if (box && box.className.indexOf(this.state.hoverClassName) === -1) {
-			box.className += " " + this.state.hoverClassName;
+		const box = this.state.dwvApp.getElement(this.props.dicom.borderClassName);
+		if (box && box.className.indexOf(this.props.dicom.hoverClassName) === -1) {
+			box.className += " " + this.props.dicom.hoverClassName;
 		}
 	};
 
@@ -313,14 +327,14 @@ class DwvComponent extends React.Component {
 	 * Handle a drag leave.
 	 * @param event The event to handle.
 	 */
-	onDragLeave = (event: DragEvent) => {
+	onDragLeave = (event: any) => {
 		// prevent default handling
 		event.stopPropagation();
 		event.preventDefault();
 		// update box class
-		const box = this.state.dwvApp.getElement(this.borderClassName + " hover");
-		if (box && box.className.indexOf(this.state.hoverClassName) !== -1) {
-			box.className = box.className.replace(" " + this.state.hoverClassName, "");
+		const box = this.state.dwvApp.getElement(this.props.dicom.borderClassName + " hover");
+		if (box && box.className.indexOf(this.props.dicom.hoverClassName) !== -1) {
+			box.className = box.className.replace(" " + this.props.dicom.hoverClassName, "");
 		}
 	};
 
@@ -328,26 +342,28 @@ class DwvComponent extends React.Component {
 	 * Show/hide the data load drop box.
 	 * @param show True to show the drop box.
 	 */
-	showDropbox = (app, show) => {
-		const box = app.getElement(this.state.dropboxClassName);
+	showDropbox = (app: any, show: boolean) => {
+		const box = app.getElement(this.props.dicom.dropboxClassName);
 		if (box) {
 			if (show) {
 				// reset css class
-				box.className = this.state.dropboxClassName + " " + this.state.borderClassName;
+				box.className = this.props.dicom.dropboxClassName + " " + this.props.dicom.borderClassName;
 				// check content
 				if (box.innerHTML === "") {
 					box.innerHTML = "Drag and drop data here.";
 				}
 				// const size = app.getLayerContainerSize();
 				const size = 1000;
+
 				// set the initial drop box size
-				const dropBoxSize = 2 * size.height / 3;
+				const dropBoxSize = 2 * size / 3;
+
 				box.setAttribute(
 					"style",
 					"width:" + dropBoxSize + "px;height:" + dropBoxSize + "px");
 			} else {
 				// remove border css class
-				box.className = this.state.dropboxClassName;
+				box.className = this.props.dicom.dropboxClassName;
 				// remove content
 				box.innerHTML = "";
 				// make not visible
@@ -367,15 +383,32 @@ class DwvComponent extends React.Component {
 		event.stopPropagation();
 		event.preventDefault();
 		// load files
-		this.state.dwvApp.loadFiles(event.dataTransfer.files);
+		if (event.dataTransfer) {
+			const { dataTransfer: { files } } = event;
+			const [file] = Array.from(files);
+
+			this.props.onFileUpload(file.name, file.size);
+			this.state.dwvApp.loadFiles(files);
+		}
 	};
 
 	// drag and drop [end] -------------------------------------------------------
 
 }
 
-DwvComponent.propTypes = {
-	classes: PropTypes.object.isRequired
+
+const mapStateToProps = (state: RootState) => ({ dicom: state.dicom });
+
+const mapDispatchToProps = {
+	setLoadProgress,
+	setMetaData,
+	setToolNames,
+	setDataLoaded,
+	setSelectedTool,
+	setShowDicomTags,
+	setToolMenuAnchorEl
 };
 
-export default withStyles(styles)(DwvComponent);
+const connector = connect(mapStateToProps, mapDispatchToProps);
+
+export default withStyles(styles)(connector(DwvComponent));

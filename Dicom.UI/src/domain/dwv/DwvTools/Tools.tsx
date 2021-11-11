@@ -1,27 +1,38 @@
-// @flow 
 import * as React from "react";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
-import { Menu, Dialog, Button, AppBar, Toolbar, IconButton, Typography } from "@material-ui/core";
+import { AppBar, Button, Dialog, IconButton, Menu, Toolbar, Typography } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
 import { TagsTable } from "domain/dwv/TagsTable/TagsTable";
-import { TransitionUp } from "domain/dwv/DwvComponent";
 
 type Props = {
-	toolMenuAnchorEl:  Element | ((element: Element) => Element) | null | undefined,
+	toolMenuAnchorEl: Element | ((element: Element) => Element) | null | undefined,
 	isDataLoaded: boolean,
 	isTagModalVisible: boolean,
 	selectedTool: string,
 	metaData: any,
-	onToolClick: () => void,
-	onReset: () => void,
+	onToolClick: (event: any) => void,
+	onReset: (event: any) => void,
 	onTagsClick: () => void,
 	onTagsClose: () => void,
-	onMenuClose: () => void,
+	onMenuClose: (event: any) => void,
 	toolsMenuItems: React.ReactNode,
 	classes: any,
 };
 
-export const Tools = ({ toolMenuAnchorEl,onToolClick, isDataLoaded, onReset, onTagsClick, isTagModalVisible, onTagsClose, toolsMenuItems, onMenuClose, selectedTool, classes, metaData }: Props) => {
+export const Tools = ({
+						  toolMenuAnchorEl,
+						  onToolClick,
+						  isDataLoaded,
+						  onReset,
+						  onTagsClick,
+						  isTagModalVisible,
+						  onTagsClose,
+						  toolsMenuItems,
+						  onMenuClose,
+						  selectedTool,
+						  classes,
+						  metaData
+					  }: Props) => {
 
 	return (
 		<div className="button-row">
@@ -31,8 +42,8 @@ export const Tools = ({ toolMenuAnchorEl,onToolClick, isDataLoaded, onReset, onT
 					onClick={onToolClick}
 					disabled={!isDataLoaded}
 					size="medium"
-			>{ selectedTool }
-				<ArrowDropDownIcon/></Button>
+			>{selectedTool}
+				<ArrowDropDownIcon /></Button>
 			<Menu
 				id="simple-menu"
 				anchorEl={toolMenuAnchorEl}
@@ -47,15 +58,9 @@ export const Tools = ({ toolMenuAnchorEl,onToolClick, isDataLoaded, onReset, onT
 					onClick={onReset}
 			>Reset</Button>
 
-			<Button variant="contained" color="primary"
-					onClick={onTagsClick}
-					disabled={!isDataLoaded}
-					size="medium">Tags</Button>
 			<Dialog
 				open={isTagModalVisible}
 				onClose={onTagsClose}
-
-				// TransitionComponent={TransitionUp}
 				classes={{ paper: classes.tagsDialog }}
 			>
 				<AppBar className={classes.appBar}>

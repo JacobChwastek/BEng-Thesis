@@ -1,0 +1,12 @@
+.account {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  height: 100%;
+
+  &__card {
+    flex: 1 3 40%;
+    height: min-content;
+    margin: 2% !important;
+  }
+}
