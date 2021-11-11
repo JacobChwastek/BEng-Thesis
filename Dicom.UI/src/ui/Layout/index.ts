@@ -1,7 +1,5 @@
-import { Layout } from './Layout/Layout'
-import { ViewerLayout } from './ViewerLayout/ViewerLayout'
+import { Layout } from "./Layout/Layout";
 
 export {
-	Layout,
-	ViewerLayout
+	Layout
 }

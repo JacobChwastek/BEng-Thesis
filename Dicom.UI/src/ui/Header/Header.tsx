@@ -1,16 +1,16 @@
 import * as React from "react";
 import { Button, Layout as ALayout, Menu } from "antd";
+import { useHistory } from "react-router-dom";
+
+import { useAppDispatch } from "application/store/hooks";
+import { setLogOut } from "domain/auth/store/authSlice";
 import Logo from "ui/assets/img/logo.png";
 import { RotatingLogo } from "ui/Logo/RotatingLogo";
 
 import "./Header.scss";
-import { useHistory } from "react-router-dom";
-import { useAppDispatch } from "application/store/hooks";
-import { setLogOut } from "domain/auth/store/authSlice";
 
 type Props = {
 	isAuth: boolean;
-
 };
 
 const { Header: AHeader } = ALayout;
@@ -18,7 +18,6 @@ const { Header: AHeader } = ALayout;
 export function Header({ isAuth }: Props) {
 	const history = useHistory();
 
-	//todo: do wyjebania zła warstwa
 	const dispatch = useAppDispatch();
 
 	return (
@@ -41,7 +40,8 @@ export function Header({ isAuth }: Props) {
 					</Button>
 				) : (
 					<>
-						<Button onClick={() => history.push("/login")}>Zaloguj</Button> <Button onClick={() => history.push("/register")}>Zarejestruj</Button>{" "}
+						<Button onClick={() => history.push("/login")}>Zaloguj</Button> <Button
+						onClick={() => history.push("/register")}>Zarejestruj</Button>{" "}
 					</>
 				)}
 			</div>

@@ -1,11 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
+import { Button } from "antd";
+import { useSelector } from "react-redux";
+
+import { RootState } from "application/store/store";
 import { RotatingLogo } from "ui/Logo/RotatingLogo";
 import Logo from "ui/assets/img/logo.png";
 
 import "./LandingPage.scss";
-import { Button } from "antd";
 
 export const LandingPage = () => {
+	const isAuth = useSelector((state: RootState) => state.auth.isAuth);
+
+	if (isAuth) {
+		return <Redirect to="/dashboard" />;
+	}
+
 	return (
 		<div className="landing-page">
 			<header className="landing-page__header">

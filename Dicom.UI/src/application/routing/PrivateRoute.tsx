@@ -6,10 +6,9 @@ type Props = {
 	children?: React.ReactNode;
 } & RouteProps;
 
-export const PublicRoute = ({ isAuthenticated, children, ...rest }: Props) => {
-	if (isAuthenticated) {
-		return <Redirect to="/dashboard" />;
-	}
+export const PrivateRoute = ({ isAuthenticated, children, ...rest }: Props) => {
+	if (!isAuthenticated)
+		return <Redirect to="/" />;
 
 	return (
 		<Route {...rest} render={() => children} />

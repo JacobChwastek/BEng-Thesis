@@ -1,4 +1,4 @@
-import { PrivateRoute } from "./PrivateRouting";
-import { PublicRouting } from "./PublicRoute";
+import { PrivateRoute } from "application/routing/PrivateRoute";
+import { PublicRoute } from "./PublicRoute";
 
-export { PrivateRoute, PublicRouting };
+export { PrivateRoute, PublicRoute };

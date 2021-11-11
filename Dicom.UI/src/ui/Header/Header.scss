@@ -14,5 +14,8 @@
 
   &__auth {
     min-width: 10%;
+    display: flex;
+    justify-content: end;
+    align-items: center;
   }
 }

@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Layout as ALayout, Menu } from "antd";
-import { UserOutlined, LaptopOutlined, NotificationOutlined } from "@ant-design/icons";
+import { ToolOutlined, UserOutlined } from "@ant-design/icons";
+import { useHistory, useRouteMatch } from "react-router-dom";
+import _ from "lodash";
+
 import { Header } from "ui/Header/Header";
 
 import "./Layout.scss";
@@ -10,44 +13,63 @@ const { Content, Sider } = ALayout;
 
 type Props = {
 	isAuth: boolean;
+	role?: string;
+	contentWrapper?: boolean;
 	children?: React.ReactNode;
 };
 
-export const Layout = ({ children, ...rest }: Props) => {
+export const Layout = ({ children, isAuth, role, contentWrapper = true }: Props) => {
+	const [openKeys, setOpenKeys] = useState<string[]>([]);
+	const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+
+	const history = useHistory();
+	const routeMatch = useRouteMatch();
+
+	useEffect(() => {
+		const handleOpenSection = () => {
+			const { path } = routeMatch || {};
+			const tempPath = path;
+			setOpenKeys([tempPath.replace("/", "")]);
+
+		};
+		handleOpenSection();
+	}, [routeMatch.path]);
+
+	const onChange = (openKeys: string[]) => setOpenKeys(openKeys);
+
+	const onSelect = ({ keyPath, selectedKeys }: any) => {
+		setSelectedKeys(selectedKeys);
+		history.push("/" + _.chain(keyPath).reverse().join("/").value());
+	};
+
 	return (
 		<ALayout className="layout">
-			<Header {...rest} />
+			<Header isAuth={isAuth} />
 			<ALayout>
 				<Sider width={200} className="layout__sider">
 					<Menu
 						className="sider_menu"
 						mode="inline"
-						defaultSelectedKeys={["1"]}
-						defaultOpenKeys={["sub1"]}
+						openKeys={openKeys}
+						onOpenChange={onChange}
+						onSelect={onSelect}
+						selectedKeys={selectedKeys}
 						style={{ height: "100%", borderRight: 0 }}
 					>
-						<SubMenu key="sub1" icon={<UserOutlined />} title="subnav 1">
-							<Menu.Item key="1">option1</Menu.Item>
-							<Menu.Item key="2">option2</Menu.Item>
-							<Menu.Item key="3">option3</Menu.Item>
-							<Menu.Item key="4">option4</Menu.Item>
+						<SubMenu key="dashboard" icon={<UserOutlined />} title="Dashboard">
+							<Menu.Item key="home">Home</Menu.Item>
+							<Menu.Item key="account">Configure account</Menu.Item>
 						</SubMenu>
-						<SubMenu key="sub2" icon={<LaptopOutlined />} title="subnav 2">
-							<Menu.Item key="5">option5</Menu.Item>
-							<Menu.Item key="6">option6</Menu.Item>
-							<Menu.Item key="7">option7</Menu.Item>
-							<Menu.Item key="8">option8</Menu.Item>
-						</SubMenu>
-						<SubMenu key="sub3" icon={<NotificationOutlined />} title="subnav 3">
-							<Menu.Item key="9">option9</Menu.Item>
-							<Menu.Item key="10">option10</Menu.Item>
-							<Menu.Item key="11">option11</Menu.Item>
-							<Menu.Item key="12">option12</Menu.Item>
-						</SubMenu>
+						<Menu.Item key="viewer" icon={<ToolOutlined />}>
+							Viewer
+						</Menu.Item>
 					</Menu>
 				</Sider>
 				<ALayout className="content-container">
-					<Content className="content-container__content">{children}</Content>
+					{
+						contentWrapper ?
+							<Content className="content-container__content">{children}</Content> : <>{children}</>
+					}
 				</ALayout>
 			</ALayout>
 		</ALayout>
