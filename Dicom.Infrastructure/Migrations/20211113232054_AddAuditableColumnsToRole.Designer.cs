@@ -3,81 +3,23 @@ using System;
 using Dicom.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Dicom.Infrastructure.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20211113232054_AddAuditableColumnsToRole")]
+    partial class AddAuditableColumnsToRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.11")
                 .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
-
-            modelBuilder.Entity("Dicom.Entity.Dicom.Dicom", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("FileName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)")
-                        .HasColumnName("file_name");
-
-                    b.Property<long>("FileSize")
-                        .HasColumnType("bigint")
-                        .HasColumnName("file_size");
-
-                    b.Property<string>("Path")
-                        .HasColumnType("text")
-                        .HasColumnName("path");
-
-                    b.HasKey("Id")
-                        .HasName("pk_dicom");
-
-                    b.ToTable("dicom");
-                });
-
-            modelBuilder.Entity("Dicom.Entity.Dicom.DwvConfiguration", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("Configuration")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("configuration");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<Guid?>("DicomId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("dicom_id");
-
-                    b.Property<DateTime?>("LastModifiedAt")
-                        .HasColumnType("timestamp without time zone")
-                        .HasColumnName("last_modified_at");
-
-                    b.HasKey("Id")
-                        .HasName("pk_dwv_configurations");
-
-                    b.HasIndex("DicomId")
-                        .HasDatabaseName("ix_dwv_configurations_dicom_id");
-
-                    b.ToTable("dwv_configurations");
-                });
 
             modelBuilder.Entity("Dicom.Entity.Identity.Role", b =>
                 {
@@ -212,26 +154,6 @@ namespace Dicom.Infrastructure.Migrations
                         .HasName("pk_volumes");
 
                     b.ToTable("volumes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("f61f2648-1ee5-4889-999a-8baa0dd6fa6a"),
-                            CreatedAt = new DateTime(2021, 11, 14, 19, 0, 0, 0, DateTimeKind.Unspecified),
-                            Host = "",
-                            LastModifiedAt = new DateTime(2021, 11, 14, 19, 0, 0, 0, DateTimeKind.Unspecified),
-                            Path = "D:\\Projects\\Software\\dicom\\Assets"
-                        });
-                });
-
-            modelBuilder.Entity("Dicom.Entity.Dicom.DwvConfiguration", b =>
-                {
-                    b.HasOne("Dicom.Entity.Dicom.Dicom", "Dicom")
-                        .WithMany("DwvConfigurations")
-                        .HasForeignKey("DicomId")
-                        .HasConstraintName("fk_dwv_configurations_dicom_dicom_id");
-
-                    b.Navigation("Dicom");
                 });
 
             modelBuilder.Entity("Dicom.Entity.Identity.User", b =>
@@ -244,11 +166,6 @@ namespace Dicom.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("Dicom.Entity.Dicom.Dicom", b =>
-                {
-                    b.Navigation("DwvConfigurations");
                 });
 
             modelBuilder.Entity("Dicom.Entity.Identity.Role", b =>

@@ -3,15 +3,17 @@ using System;
 using Dicom.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Dicom.Infrastructure.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20211114172920_CreateDicomAndDwvConfigurationEntity")]
+    partial class CreateDicomAndDwvConfigurationEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -212,16 +214,6 @@ namespace Dicom.Infrastructure.Migrations
                         .HasName("pk_volumes");
 
                     b.ToTable("volumes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("f61f2648-1ee5-4889-999a-8baa0dd6fa6a"),
-                            CreatedAt = new DateTime(2021, 11, 14, 19, 0, 0, 0, DateTimeKind.Unspecified),
-                            Host = "",
-                            LastModifiedAt = new DateTime(2021, 11, 14, 19, 0, 0, 0, DateTimeKind.Unspecified),
-                            Path = "D:\\Projects\\Software\\dicom\\Assets"
-                        });
                 });
 
             modelBuilder.Entity("Dicom.Entity.Dicom.DwvConfiguration", b =>

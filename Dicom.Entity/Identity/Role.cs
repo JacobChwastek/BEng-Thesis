@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Dicom.Entity.Common;
 
 namespace Dicom.Entity.Identity
 {
-    public class Role : IEntity
+    public class Role : AuditableEntity, IEntity
     {
         public Guid Id { get; set; }
 

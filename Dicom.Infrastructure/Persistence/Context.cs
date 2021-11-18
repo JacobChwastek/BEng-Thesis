@@ -1,5 +1,9 @@
-﻿using Dicom.Entity.Identity;
+﻿using Dicom.Entity;
+using Dicom.Entity.Dicom;
+using Dicom.Entity.Identity;
 using Dicom.Infrastructure.Common;
+using Dicom.Infrastructure.EntityTypeConfiguration;
+using Dicom.Infrastructure.EntityTypeConfiguration.Dicom;
 using Dicom.Infrastructure.EntityTypeConfiguration.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -25,8 +29,20 @@ namespace Dicom.Infrastructure.Persistence
 
             //roles
             new RoleEntityTypeConfiguration().Configure(builder.Entity<Role>());
+
+            //volumes
+            new VolumeEntityTypeConfiguration().Configure(builder.Entity<Volume>());
+
+            //dicom
+            new DicomEntityTypeConfiguration().Configure(builder.Entity<Entity.Dicom.Dicom>());
+
+            //dwvConfiguration
+            new DwvConfigurationEntityTypeConfiguration().Configure(builder.Entity<DwvConfiguration>());
         }
 
+
+        public DbSet<Volume> Volumes { get; set; }
+        public DbSet<DwvConfiguration> DwvConfigurations { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
     }

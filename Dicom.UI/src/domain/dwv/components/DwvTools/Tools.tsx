@@ -2,7 +2,7 @@ import * as React from "react";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import { AppBar, Button, Dialog, IconButton, Menu, Toolbar, Typography } from "@material-ui/core";
 import CloseIcon from "@material-ui/icons/Close";
-import { TagsTable } from "domain/dwv/TagsTable/TagsTable";
+import { TagsTable } from "domain/dwv/components/TagsTable/TagsTable";
 
 type Props = {
 	toolMenuAnchorEl: Element | ((element: Element) => Element) | null | undefined,

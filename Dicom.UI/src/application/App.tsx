@@ -8,6 +8,8 @@ import { useUserMutation } from "domain/auth/store/api";
 import { DashboardPage, LandingPage, LoginPage, RegisterPage, Viewer } from "./pages";
 import { setLogOut, setUser } from "domain/auth/store/authSlice";
 
+import "./App.scss"
+
 const App = () => {
 	const dispatch = useDispatch();
 	const [getUser, {}] = useUserMutation();

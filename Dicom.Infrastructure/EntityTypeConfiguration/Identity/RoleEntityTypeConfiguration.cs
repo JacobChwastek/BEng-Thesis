@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Dicom.Infrastructure.EntityTypeConfiguration.Identity
 {
-    public class RoleEntityTypeConfiguration: IEntityTypeConfiguration<Role>
+    public class RoleEntityTypeConfiguration : IEntityTypeConfiguration<Role>
     {
         public void Configure(EntityTypeBuilder<Role> builder)
         {

@@ -1,8 +1,7 @@
-﻿using System;
-using Dicom.Application.Responses;
+﻿using Dicom.Application.Responses;
 using MediatR;
 
-namespace Dicom.Application.Commands
+namespace Dicom.Application.Commands.Login
 {
     public class LoginCommand : IRequest<AuthenticationResponse>
     {

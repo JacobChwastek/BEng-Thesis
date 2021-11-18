@@ -2,9 +2,9 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Dicom.Application.Commands;
+using Dicom.Application.Commands.CreateUser;
+using Dicom.Application.Commands.Login;
 using Dicom.Application.Queries;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 

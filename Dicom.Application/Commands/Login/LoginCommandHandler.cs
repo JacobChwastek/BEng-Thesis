@@ -4,7 +4,7 @@ using Dicom.Application.Common.Interfaces;
 using Dicom.Application.Responses;
 using MediatR;
 
-namespace Dicom.Application.Commands
+namespace Dicom.Application.Commands.Login
 {
     public class LoginCommandHandler : IRequestHandler<LoginCommand, AuthenticationResponse>
     {

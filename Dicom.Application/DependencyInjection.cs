@@ -5,6 +5,8 @@ using System.Reflection;
 using Dicom.Application.Common.Behaviors;
 using Dicom.Application.Common.Interfaces;
 using Dicom.Application.Services;
+using Dicom.Imaging;
+using FellowOakDicom;
 
 namespace Dicom.Application
 {
@@ -18,6 +20,12 @@ namespace Dicom.Application
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehaviour<,>));
             services.AddTransient<IAuthentication, AuthenticationService>();
+            services.AddTransient<IDicomService, DicomService>();
+
+            new DicomSetupBuilder()
+                .RegisterServices(s => s.AddFellowOakDicom())
+                .Build();
+
 
             return services;
         }

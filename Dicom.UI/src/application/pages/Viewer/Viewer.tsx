@@ -1,42 +1,37 @@
 import * as React from "react";
-import { useSelector } from "react-redux";
-import { useSetState } from "ahooks";
+import { useDispatch, useSelector } from "react-redux";
 
-import DwvComponent from "domain/dwv/DwvComponent";
+import { DwvComponent, ManagementSider } from "domain/dwv/components";
 import { RootState } from "application/store/store";
 import { Layout } from "ui/Layout";
-import { ManagementSider } from "domain/dwv/Management/ManagementSider";
+import { api } from "infrastructure/persistance/axios";
 
 import "./Viewer.scss";
+import { uploadDicom } from "domain/dwv/store/dicomSlice";
 
 type Props = {};
 
-interface State {
-	file: {
-		fileName: string,
-		fileSize: number
-	};
-}
 
 export const Viewer = (props: Props) => {
-
-	//todo refactor
-	const [dicom, setDicom] = useSetState<State>({
-		file: {
-			fileName: "",
-			fileSize: 0
-		}
-	});
-
+	const dispatch = useDispatch();
 	const isAuth = useSelector((state: RootState) => state.auth.isAuth);
+	const dicom = useSelector((state: RootState) => state.dicom.dicom);
 
-	const onFileUpload = (fileName: string, fileSize: number) => {
-		setDicom({
-			file: {
-				fileName,
-				fileSize
-			}
-		});
+	const onFileUpload = async (files: FileList) => {
+
+		const form = new FormData();
+		const file = files[0];
+		form.append(file.name, file, file.name);
+
+
+		try {
+			dispatch(uploadDicom({ fileName: file.name, fileSize: file.size }));
+			const result = await api.post("/dicom/upload-dicom", form, { headers: { "Content-Type": "multipart/form-data" } });
+		} catch (e) {
+			console.log(e);
+		} finally {
+
+		}
 	};
 
 	return (
@@ -44,7 +39,7 @@ export const Viewer = (props: Props) => {
 			<div className="viewer">
 				<DwvComponent onFileUpload={onFileUpload} />
 				{
-					dicom.file.fileName && <ManagementSider dicom={dicom} />
+					dicom.uploaded && <ManagementSider />
 				}
 			</div>
 		</Layout>

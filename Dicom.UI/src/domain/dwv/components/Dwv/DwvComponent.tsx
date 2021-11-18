@@ -1,24 +1,26 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { withStyles } from "@material-ui/core/styles";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import MenuItem from "@material-ui/core/MenuItem";
-import { Tools } from "./DwvTools/Tools";
-
 // @ts-ignore
 import dwv from "dwv";
 
-import "./DwvComponent.css";
+import { withStyles } from "@material-ui/core/styles";
+import LinearProgress from "@material-ui/core/LinearProgress";
+import MenuItem from "@material-ui/core/MenuItem";
+import { Tools } from "domain/dwv/components";
 import {
+	removeDicomCompleted,
 	setDataLoaded,
 	setLoadProgress,
 	setMetaData,
 	setSelectedTool,
 	setShowDicomTags,
 	setToolMenuAnchorEl,
-	setToolNames
+	setToolNames,
 } from "domain/dwv/store/dicomSlice";
 import { RootState } from "application/store/store";
+
+import "./DwvComponent.css";
+import { IDwvApp } from "domain/dwv/types";
 
 
 // get element
@@ -56,11 +58,12 @@ const styles: any = (theme: any) => ({
 });
 
 type Props = ConnectedProps<typeof connector> & {
-	onFileUpload: (fileName: string, fileSize: number) => void;
+	onFileUpload: (files: FileList) => void;
 	classes?: any;
 }
+
 type State = {
-	dwvApp: any
+	dwvApp: IDwvApp | null
 }
 
 class DwvComponent extends React.Component<Props, State> {
@@ -77,15 +80,15 @@ class DwvComponent extends React.Component<Props, State> {
 		const {
 			classes,
 			dicom: {
-				versions,
-				tools,
-				toolNames,
-				loadProgress,
-				showDicomTags,
-				selectedTool,
-				dataLoaded,
-				metaData,
-				toolMenuAnchorEl
+				dwv: {
+					toolNames,
+					loadProgress,
+					showDicomTags,
+					selectedTool,
+					dataLoaded,
+					metaData,
+					toolMenuAnchorEl
+				}
 			}
 		} = this.props;
 
@@ -120,6 +123,33 @@ class DwvComponent extends React.Component<Props, State> {
 		);
 	}
 
+	componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>) {
+
+		/**
+		 * Remove DICOM
+		 */
+		if (prevProps.dicom.actions.remove != this.props.dicom.actions.remove && this.props.dicom.actions.remove && this.state.dwvApp !== null) {
+			console.log("xd");
+			console.log(this.state.dwvApp.getToolboxController());
+			console.log(this.state.dwvApp.getToolboxController().getToolList());
+			// this.state.dwvApp.resetLayout();
+		}
+
+		/**
+		 * Change tool
+		 */
+
+		if(prevProps.dicom.dwv.selectedTool !== this.props.dicom.dwv.selectedTool) {
+			const { selectedTool } = this.props.dicom.dwv;
+			this.state.dwvApp?.setTool(selectedTool);
+			if (selectedTool === "Draw") {
+				this.onChangeShape(this.props.dicom.dwv.tools.Draw.options[0]);
+			}
+		}
+	}
+
+
+
 	componentDidMount() {
 		// create app
 		const app = new dwv.App();
@@ -127,7 +157,7 @@ class DwvComponent extends React.Component<Props, State> {
 		// initialise app
 		app.init({
 			"containerDivId": "dwv",
-			"tools": this.props.dicom.tools
+			"tools": this.props.dicom.dwv.tools
 		});
 
 		// load events
@@ -152,14 +182,13 @@ class DwvComponent extends React.Component<Props, State> {
 			this.props.setMetaData(dwv.utils.objectToArray(app.getMetaData()));
 			// available tools
 			let names = [];
-			for (const key in this.props.dicom.tools) {
+			for (const key in this.props.dicom.dwv.tools) {
 				if ((key === "Scroll" && app.canScroll()) ||
 					(key === "WindowLevel" && app.canWindowLevel()) ||
 					(key !== "Scroll" && key !== "WindowLevel")) {
 					names.push(key);
 				}
 			}
-			console.log(names);
 			this.props.setToolNames(names);
 			this.onChangeTool(names[0]);
 			// set the selected tool
@@ -230,7 +259,7 @@ class DwvComponent extends React.Component<Props, State> {
 			this.props.setSelectedTool(tool);
 			this.state.dwvApp.setTool(tool);
 			if (tool === "Draw") {
-				this.onChangeShape(this.props.dicom.tools.Draw.options[0]);
+				this.onChangeShape(this.props.dicom.dwv.tools.Draw.options[0]);
 			}
 		}
 	};
@@ -316,10 +345,15 @@ class DwvComponent extends React.Component<Props, State> {
 		// prevent default handling
 		event.stopPropagation();
 		event.preventDefault();
+
+		if (!this.state.dwvApp) {
+			//todo error handling
+			return;
+		}
 		// update box border
-		const box = this.state.dwvApp.getElement(this.props.dicom.borderClassName);
-		if (box && box.className.indexOf(this.props.dicom.hoverClassName) === -1) {
-			box.className += " " + this.props.dicom.hoverClassName;
+		const box = this.state.dwvApp.getElement(this.props.dicom.dwv.borderClassName);
+		if (box && box.className.indexOf(this.props.dicom.dwv.hoverClassName) === -1) {
+			box.className += " " + this.props.dicom.dwv.hoverClassName;
 		}
 	};
 
@@ -331,10 +365,16 @@ class DwvComponent extends React.Component<Props, State> {
 		// prevent default handling
 		event.stopPropagation();
 		event.preventDefault();
+
+		if (!this.state.dwvApp) {
+			//todo error handling
+			return;
+		}
+
 		// update box class
-		const box = this.state.dwvApp.getElement(this.props.dicom.borderClassName + " hover");
-		if (box && box.className.indexOf(this.props.dicom.hoverClassName) !== -1) {
-			box.className = box.className.replace(" " + this.props.dicom.hoverClassName, "");
+		const box = this.state.dwvApp.getElement(this.props.dicom.dwv.borderClassName + " hover");
+		if (box && box.className.indexOf(this.props.dicom.dwv.hoverClassName) !== -1) {
+			box.className = box.className.replace(" " + this.props.dicom.dwv.hoverClassName, "");
 		}
 	};
 
@@ -343,11 +383,11 @@ class DwvComponent extends React.Component<Props, State> {
 	 * @param show True to show the drop box.
 	 */
 	showDropbox = (app: any, show: boolean) => {
-		const box = app.getElement(this.props.dicom.dropboxClassName);
+		const box = app.getElement(this.props.dicom.dwv.dropboxClassName);
 		if (box) {
 			if (show) {
 				// reset css class
-				box.className = this.props.dicom.dropboxClassName + " " + this.props.dicom.borderClassName;
+				box.className = this.props.dicom.dwv.dropboxClassName + " " + this.props.dicom.dwv.borderClassName;
 				// check content
 				if (box.innerHTML === "") {
 					box.innerHTML = "Drag and drop data here.";
@@ -363,7 +403,7 @@ class DwvComponent extends React.Component<Props, State> {
 					"width:" + dropBoxSize + "px;height:" + dropBoxSize + "px");
 			} else {
 				// remove border css class
-				box.className = this.props.dicom.dropboxClassName;
+				box.className = this.props.dicom.dwv.dropboxClassName;
 				// remove content
 				box.innerHTML = "";
 				// make not visible
@@ -378,22 +418,25 @@ class DwvComponent extends React.Component<Props, State> {
 	 * Handle a drop event.
 	 * @param event The event to handle.
 	 */
-	onDrop = (event: DragEvent) => {
+	onDrop = async (event: DragEvent) => {
 		// prevent default handling
 		event.stopPropagation();
 		event.preventDefault();
+
+		if (!this.state.dwvApp) {
+			//todo error handling
+			return;
+		}
+
 		// load files
 		if (event.dataTransfer) {
 			const { dataTransfer: { files } } = event;
-			const [file] = Array.from(files);
-
-			this.props.onFileUpload(file.name, file.size);
 			this.state.dwvApp.loadFiles(files);
+			this.props.onFileUpload(files);
 		}
 	};
 
 	// drag and drop [end] -------------------------------------------------------
-
 }
 
 
@@ -406,7 +449,8 @@ const mapDispatchToProps = {
 	setDataLoaded,
 	setSelectedTool,
 	setShowDicomTags,
-	setToolMenuAnchorEl
+	setToolMenuAnchorEl,
+	removeDicomCompleted,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);

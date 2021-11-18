@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
-using Dicom.Application.Commands;
+using Dicom.Application.Commands.CreateUser;
+using Dicom.Application.Commands.Login;
 using Dicom.Application.Responses;
 
 namespace Dicom.Application.Common.Interfaces
