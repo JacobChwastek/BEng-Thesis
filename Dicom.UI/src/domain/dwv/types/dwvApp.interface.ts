@@ -113,7 +113,7 @@ export interface IDwvApp {
 	 * @todo: correct return object
 	 * @returns {Image} The associated image.
 	 */
-	getImage: (index: number) => any,
+	getImage: (index?: number) => any,
 
 	/**
 	 * Get the size available for the layer container div.

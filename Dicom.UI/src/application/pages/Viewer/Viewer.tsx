@@ -8,6 +8,7 @@ import { api } from "infrastructure/persistance/axios";
 
 import "./Viewer.scss";
 import { uploadDicom } from "domain/dwv/store/dicomSlice";
+import { TagsModal } from "domain/dwv/components/Tags";
 
 type Props = {};
 
@@ -42,6 +43,7 @@ export const Viewer = (props: Props) => {
 					dicom.uploaded && <ManagementSider />
 				}
 			</div>
+			<TagsModal />
 		</Layout>
 	);
 };

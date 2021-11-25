@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -15,18 +16,33 @@ namespace Dicom.API.Controllers
     public class UserController : ApiController
     {
         [HttpPost("register")]
-        public async Task<IActionResult>
-            CreateUserAsync([FromBody] CreateUserCommand createUser)
+        public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserCommand createUser)
         {
             var result = await Mediator.Send(createUser);
-            return result != null ? Created("", result) : BadRequest(result);
+            return result != null ? Created("", result) : BadRequest();
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginCommand login)
         {
             var result = await Mediator.Send(login);
-            return result != null ? Ok(result) : BadRequest(result);
+
+            if (result == null)
+            {
+                return BadRequest();
+            }
+
+            if (result.Errors is null)
+            {
+                return Ok(result);
+            }
+
+            if (result.Errors.Any())
+            {
+                return Unauthorized(result);
+            }
+
+            return Ok(result);
         }
 
         [HttpGet()]
@@ -40,17 +56,15 @@ namespace Dicom.API.Controllers
                 return NotFound();
 
             var result = await Mediator.Send(new AuthUserInfoQuery() { UserId = userId });
-            return result != null ? Ok(result) : (IActionResult)NotFound();
+            return result != null ? Ok(result) : NotFound();
         }
 
-
-        [HttpGet("get-user/{userid}")]
+        [HttpGet("get-user/{userid:guid}")]
         [Authorize]
-        public async Task<IActionResult>
-            FindUserByIdAsync([FromRoute] Guid userId)
+        public async Task<IActionResult> FindUserByIdAsync([FromRoute] Guid userId)
         {
             var result = await Mediator.Send(new UserInfoQuery { UserId = userId });
-            return result != null ? Ok(result) : (IActionResult)NotFound();
+            return result != null ? Ok(result) : NotFound();
         }
     }
 }

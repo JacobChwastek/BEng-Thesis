@@ -4,7 +4,7 @@ export interface IDicomState {
 			dwv: string
 			react: string
 		},
-		tools:  {
+		tools: {
 			Opacity: {},
 			Livewire: {},
 			Filter: {},
@@ -22,7 +22,7 @@ export interface IDicomState {
 		selectedTool: string,
 		loadProgress: number,
 		dataLoaded: boolean,
-		metaData: any[],
+		metaData: IMetaData[],
 		showDicomTags: boolean,
 		toolMenuAnchorEl: any,
 		dropboxClassName: string,
@@ -33,11 +33,30 @@ export interface IDicomState {
 	dicom: {
 		uploaded: boolean
 		fileName: string,
-		fileSize: number
+		fileSize: number,
+		slices: number,
+		frames: number,
+		sliceNo: number,
+		frameNo: number
 	},
 	actions: {
-		remove: boolean
+		reset: boolean,
+		undo: number;
+		restart: boolean;
+		generatePDF: boolean;
 	}
+}
+
+export type IMetaDataValue = string | string[] | "(no value available)" | IMetaData[];
+
+export interface IMetaData {
+	name: string,
+	value: IMetaDataValue,
+	group?: string,
+	element?: string,
+	vr?: string,
+	vl?: number,
+	merged?: boolean
 }
 
 export interface IUploadDicomPayload {

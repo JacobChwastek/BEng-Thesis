@@ -79,7 +79,7 @@ export interface ILayerController {
 	 *
 	 * @returns {object} The layer.
 	 */
-	getActiveDrawLayer: () => void;
+	getActiveDrawLayer: () => any;
 
 	/**
 	 * Get the active image layer.

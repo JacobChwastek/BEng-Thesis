@@ -2,25 +2,34 @@ import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 // @ts-ignore
 import dwv from "dwv";
+import {encode} from 'upng-js'
 
 import { withStyles } from "@material-ui/core/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import MenuItem from "@material-ui/core/MenuItem";
 import { Tools } from "domain/dwv/components";
 import {
-	removeDicomCompleted,
+	setActiveFrame,
+	setActiveSlice,
 	setDataLoaded,
+	setFrames,
+	setGeneratePdf,
 	setLoadProgress,
 	setMetaData,
+	setRestart,
+	setRestartApp,
+	setSelectedShape,
 	setSelectedTool,
 	setShowDicomTags,
+	setSlices,
 	setToolMenuAnchorEl,
-	setToolNames,
+	setToolNames
 } from "domain/dwv/store/dicomSlice";
 import { RootState } from "application/store/store";
 
 import "./DwvComponent.css";
 import { IDwvApp } from "domain/dwv/types";
+import { arrayBufferToBase64 } from "utils/Image";
 
 
 // get element
@@ -67,7 +76,6 @@ type State = {
 }
 
 class DwvComponent extends React.Component<Props, State> {
-
 	constructor(props: Props) {
 		super(props);
 
@@ -78,7 +86,6 @@ class DwvComponent extends React.Component<Props, State> {
 
 	render() {
 		const {
-			classes,
 			dicom: {
 				dwv: {
 					toolNames,
@@ -105,16 +112,11 @@ class DwvComponent extends React.Component<Props, State> {
 				<Tools
 					toolMenuAnchorEl={toolMenuAnchorEl}
 					isDataLoaded={dataLoaded}
-					isTagModalVisible={showDicomTags}
 					selectedTool={selectedTool}
-					metaData={metaData}
 					onToolClick={this.handleMenuButtonClick}
 					onReset={this.onReset}
-					onTagsClick={this.handleTagsDialogOpen}
-					onTagsClose={this.handleTagsDialogClose}
 					onMenuClose={this.handleMenuClose}
 					toolsMenuItems={toolsMenuItems}
-					classes={classes}
 				/>
 				<div className="layerContainer">
 					{dataLoaded ? <div className="drawDiv"></div> : <div className="dropBox"></div>}
@@ -128,30 +130,94 @@ class DwvComponent extends React.Component<Props, State> {
 		/**
 		 * Remove DICOM
 		 */
-		if (prevProps.dicom.actions.remove != this.props.dicom.actions.remove && this.props.dicom.actions.remove && this.state.dwvApp !== null) {
-			console.log("xd");
-			console.log(this.state.dwvApp.getToolboxController());
-			console.log(this.state.dwvApp.getToolboxController().getToolList());
-			// this.state.dwvApp.resetLayout();
+		if (prevProps.dicom.actions.restart != this.props.dicom.actions.restart && this.props.dicom.actions.restart) {
+			this.props.setRestartApp(false);
+
+			//todo: temporary
+			// dwv.App().reset();
+			// this.state.dwvApp?.reset();
+			// this.showDropbox(this.state.dwvApp, true);
+			window.location.reload();
 		}
 
 		/**
 		 * Change tool
 		 */
-
-		if(prevProps.dicom.dwv.selectedTool !== this.props.dicom.dwv.selectedTool) {
+		if (prevProps.dicom.dwv.selectedTool !== this.props.dicom.dwv.selectedTool) {
 			const { selectedTool } = this.props.dicom.dwv;
 			this.state.dwvApp?.setTool(selectedTool);
 			if (selectedTool === "Draw") {
 				this.onChangeShape(this.props.dicom.dwv.tools.Draw.options[0]);
 			}
 		}
+
+		/**
+		 * Reset
+		 */
+		if (prevProps.dicom.actions.reset !== this.props.dicom.actions.reset && this.props.dicom.actions.reset) {
+			this.state.dwvApp?.resetLayout();
+			this.state.dwvApp?.resetZoom();
+			this.state.dwvApp?.resetDisplay();
+			this.state.dwvApp?.deleteDraws();
+
+			this.props.setRestart(false);
+		}
+
+		/**
+		 * Generate pdf
+		 */
+		if (prevProps.dicom.actions.generatePDF !== this.props.dicom.actions.generatePDF && this.props.dicom.actions.generatePDF) {
+
+
+
+			console.log(this.state.dwvApp?.getImage());
+			const imageBuffer = this.state.dwvApp?.getImage().getBuffer();
+
+			console.log(imageBuffer);
+
+			const imageData = this.state.dwvApp?.getLayerController().getActiveViewLayer().getImageData();
+			console.log(imageData);
+			console.log(imageData.data);
+			console.log(imageData.width);
+			console.log(this.state.dwvApp?.getLayerController());
+
+			const img  = encode([imageData.data.buffer], imageData.width, imageData.height, 0);
+			console.log(img);
+
+			console.log(arrayBufferToBase64(img));
+
+			const stage = this.state.dwvApp?.getLayerController().getActiveDrawLayer().getKonvaStage();
+			const dataURL = stage.toDataURL();
+			console.log(dataURL);
+			this.props.setGeneratePdf(false);
+		}
+
+		/**
+		 * Undo
+		 */
+		if (prevProps.dicom.actions.undo !== this.props.dicom.actions.undo) {
+			this.state.dwvApp?.undo();
+
+			console.log(this.state.dwvApp?.getLayerController());
+
+			const xd = this.state.dwvApp?.getLayerController().getActiveViewLayer().getViewController();
+			console.log(this.state.dwvApp?.getImage());
+
+			console.log((this.state.dwvApp?.getLayerController().getActiveDrawLayer() as any).getKonvaLayer());
+			console.log(this.state.dwvApp?.getLayerController().getActiveViewLayer().getImageData());
+		}
+
+		/**
+		 * On selectedToolOptionChange
+		 */
+		if (prevProps.dicom.dwv.shape !== "" && prevProps.dicom.dwv.shape !== this.props.dicom.dwv.shape) {
+			this.state.dwvApp?.getToolboxController().setSelectedShape(this.props.dicom.dwv.shape);
+			console.log(this.state.dwvApp?.getToolboxController().getToolList());
+			console.log(this.state.dwvApp?.getToolboxController().getSelectedTool());
+		}
 	}
 
-
-
-	componentDidMount() {
-		// create app
+	initApp() {
 		const app = new dwv.App();
 
 		// initialise app
@@ -177,6 +243,21 @@ class DwvComponent extends React.Component<Props, State> {
 			this.props.setLoadProgress(event.loaded);
 		});
 
+		app.addEventListener("drawcreate", (event: any) => {
+			console.log(event);
+		});
+
+		// set active slice
+		app.addEventListener("slicechange", (event: any) => {
+			console.log(event);
+			this.props.setActiveSlice(event.value[0]);
+		});
+
+		// set active framechange
+		app.addEventListener("framechange", (event: any) => {
+			this.props.setActiveFrame(event.frame);
+		});
+
 		app.addEventListener("load", () => {
 			// set dicom tags
 			this.props.setMetaData(dwv.utils.objectToArray(app.getMetaData()));
@@ -193,7 +274,13 @@ class DwvComponent extends React.Component<Props, State> {
 			this.onChangeTool(names[0]);
 			// set the selected tool
 			let selectedTool = "Scroll";
-			if (app.isMonoSliceData() && app.getImage().getNumberOfFrames() === 1) {
+
+			const image = app.getImage();
+			const framesNo = image?.getNumberOfFrames();
+			this.props.setFrames(framesNo);
+			this.props.setSlices(image.getGeometry().getSize().getNumberOfSlices());
+
+			if (app.isMonoSliceData() && framesNo === 1) {
 				selectedTool = "ZoomAndPan";
 			}
 			this.onChangeTool(selectedTool);
@@ -202,6 +289,7 @@ class DwvComponent extends React.Component<Props, State> {
 		});
 
 		app.addEventListener("loadend", (/*event*/) => {
+			console.log(dwv);
 			if (nReceivedError) {
 				this.props.setLoadProgress(0);
 				alert("Received errors during load. Check log for details.");
@@ -250,6 +338,10 @@ class DwvComponent extends React.Component<Props, State> {
 		dwv.utils.loadFromUri(window.location.href, app);
 	}
 
+	componentDidMount() {
+		this.initApp();
+	}
+
 	/**
 	 * Handle a change tool event.
 	 * @param tool The new tool name.
@@ -271,6 +363,7 @@ class DwvComponent extends React.Component<Props, State> {
 	onChangeShape = (shape: any) => {
 		if (this.state.dwvApp) {
 			this.state.dwvApp.setDrawShape(shape);
+			this.props.setSelectedShape(shape);
 		}
 	};
 
@@ -450,7 +543,14 @@ const mapDispatchToProps = {
 	setSelectedTool,
 	setShowDicomTags,
 	setToolMenuAnchorEl,
-	removeDicomCompleted,
+	setActiveSlice,
+	setActiveFrame,
+	setFrames,
+	setSlices,
+	setSelectedShape,
+	setRestartApp,
+	setRestart,
+	setGeneratePdf
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);

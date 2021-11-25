@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Dicom.API.Filters.DocumentFilters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -21,6 +22,7 @@ namespace Dicom.API.Installers.InstallServices
                     Type = SecuritySchemeType.ApiKey
                 });
 
+                c.DocumentFilter<LowercaseDocumentFilter>();
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {
                     {

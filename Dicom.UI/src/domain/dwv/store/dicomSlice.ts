@@ -12,7 +12,11 @@ export const initialState: IDicomState = {
 	dicom: {
 		fileName: "",
 		fileSize: 0,
-		uploaded: false
+		uploaded: false,
+		slices: 0,
+		frameNo: 0,
+		frames: 0,
+		sliceNo: 0
 	},
 	dwv: {
 		versions: {
@@ -46,7 +50,10 @@ export const initialState: IDicomState = {
 		shape: ""
 	},
 	actions: {
-		remove: false
+		reset: false,
+		undo: 0,
+		restart: false,
+		generatePDF: false
 	}
 };
 
@@ -72,26 +79,52 @@ export const dicomSlice = createSlice({
 		setSelectedTool: (state, { payload }: PayloadAction<string>) => {
 			state.dwv.selectedTool = payload;
 		},
+		setSelectedShape: (state, { payload }: PayloadAction<string>) => {
+			state.dwv.shape = payload;
+		},
 		setShowDicomTags: (state, { payload }: PayloadAction<boolean>) => {
 			state.dwv.showDicomTags = payload;
 		},
 		setToolMenuAnchorEl: (state, { payload }: PayloadAction<any>) => {
 			state.dwv.toolMenuAnchorEl = payload;
 		},
-		removeDicom:  (state) => {
-			// state.dwv = initialState.dwv;
-			// state.dicom = initialState.dicom;
-			state.actions.remove = true;
-		},
-		removeDicomCompleted: (state) => {
-			state.actions.remove = false;
+		removeDicom: (state) => {
+			state.actions.restart = true;
 		},
 		uploadDicom: (state, { payload: { fileSize, fileName } }: PayloadAction<IUploadDicomPayload>) => {
 			state.dicom = {
 				fileName,
 				fileSize,
-				uploaded: true
+				uploaded: true,
+				slices: 0,
+				sliceNo: 0,
+				frames: 0,
+				frameNo: 0
 			};
+		},
+		undo: (state) => {
+			state.actions.undo++;
+		},
+		setRestartApp: (state, { payload }: PayloadAction<boolean>) => {
+			state.actions.restart = payload;
+		},
+		setActiveSlice: (state, { payload }: PayloadAction<number>) => {
+			state.dicom.sliceNo = payload;
+		},
+		setSlices: (state, { payload }: PayloadAction<number>) => {
+			state.dicom.slices = payload;
+		},
+		setFrames: (state, { payload }: PayloadAction<number>) => {
+			state.dicom.frames = payload;
+		},
+		setActiveFrame: (state, { payload }: PayloadAction<number>) => {
+			state.dicom.frameNo = payload;
+		},
+		setRestart: (state, { payload }: PayloadAction<boolean>) => {
+			state.actions.reset = payload;
+		},
+		setGeneratePdf: (state, { payload }: PayloadAction<boolean>) => {
+			state.actions.generatePDF = payload;
 		}
 	}
 });
@@ -106,5 +139,13 @@ export const {
 	setToolMenuAnchorEl,
 	uploadDicom,
 	removeDicom,
-	removeDicomCompleted,
+	undo,
+	setActiveSlice,
+	setFrames,
+	setActiveFrame,
+	setSlices,
+	setSelectedShape,
+	setRestartApp,
+	setRestart,
+	setGeneratePdf
 } = dicomSlice.actions;

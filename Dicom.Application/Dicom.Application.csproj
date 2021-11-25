@@ -13,11 +13,13 @@
     <PackageReference Include="fo-dicom" Version="5.0.1" />
     <PackageReference Include="fo-dicom.ImageSharp" Version="4.0.8" />
     <PackageReference Include="fo-dicom.NetCore" Version="4.0.8" />
+    <PackageReference Include="Handlebars.Net" Version="2.0.9" />
     <PackageReference Include="MediatR" Version="9.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="9.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.11" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
+    <PackageReference Include="PuppeteerSharp" Version="5.0.0" />
   </ItemGroup>
 
   <ItemGroup>
