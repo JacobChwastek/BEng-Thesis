@@ -37,13 +37,16 @@ export interface IDicomState {
 		slices: number,
 		frames: number,
 		sliceNo: number,
-		frameNo: number
+		frameNo: number,
+		serverUploaded: boolean,
+		dicomId: string
 	},
 	actions: {
 		reset: boolean,
 		undo: number;
 		restart: boolean;
 		generatePDF: boolean;
+		loading: boolean
 	}
 }
 

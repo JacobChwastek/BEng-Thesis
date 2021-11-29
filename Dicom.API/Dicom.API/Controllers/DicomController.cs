@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Dicom.API.Extensions;
+using Dicom.Application.Commands.Dicom.RemoveDicom;
 using Dicom.Application.Commands.Dicom.UploadDicom;
 using Dicom.Application.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -13,6 +15,7 @@ namespace Dicom.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class DicomController : ApiController
     {
         private readonly IDicomService _dicomService;
@@ -27,9 +30,10 @@ namespace Dicom.API.Controllers
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         [DisableRequestSizeLimit]
         [Consumes("multipart/form-data")]
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> UploadDicom()
         {
+            var userId  = User.GetUserId();
+            
             IEnumerable<IFormFile> files = Request.Form.Files;
 
             if (files.Count() != 1)
@@ -44,20 +48,43 @@ namespace Dicom.API.Controllers
                 return BadRequest("Empty file");
             }
 
-            var result = await Mediator.Send(request: new UploadDicomCommand()
+            var result = await Mediator.Send(new UploadDicomCommand()
             {
-                File = file
+                File = file,
+                UserId = userId
             });
             
             return Ok(result);
         }
 
-        [HttpGet()]
+        [HttpGet]
         public async Task<IActionResult> LoadDicom()
         {
             var result = await _dicomService.LoadDicom();
             return Ok(result);
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> RemoveDicom([FromQuery] Guid id)
+        {
+            try
+            {
+                if (Guid.Empty == id)
+                {
+                    return NotFound();
+                }
+
+                await Mediator.Send(new RemoveDicomCommandRequest()
+                {
+                    Id = id
+                });
+
+                return Ok();
+            }
+            catch (Exception)
+            {
+                return BadRequest();
+            }
+        }
     }
 }

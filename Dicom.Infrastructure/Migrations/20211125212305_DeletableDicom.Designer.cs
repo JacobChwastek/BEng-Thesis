@@ -3,15 +3,17 @@ using System;
 using Dicom.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Dicom.Infrastructure.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20211125212305_DeletableDicom")]
+    partial class DeletableDicom
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,15 +58,8 @@ namespace Dicom.Infrastructure.Migrations
                         .HasColumnType("text")
                         .HasColumnName("path");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
                     b.HasKey("Id")
                         .HasName("pk_dicom");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("ix_dicom_user_id");
 
                     b.ToTable("dicom");
                 });
@@ -247,18 +242,6 @@ namespace Dicom.Infrastructure.Migrations
                         });
                 });
 
-            modelBuilder.Entity("Dicom.Entity.Dicom.Dicom", b =>
-                {
-                    b.HasOne("Dicom.Entity.Identity.User", "User")
-                        .WithMany("Dicoms")
-                        .HasForeignKey("UserId")
-                        .HasConstraintName("fk_dicom_users_user_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Dicom.Entity.Dicom.DwvConfiguration", b =>
                 {
                     b.HasOne("Dicom.Entity.Dicom.Dicom", "Dicom")
@@ -289,11 +272,6 @@ namespace Dicom.Infrastructure.Migrations
             modelBuilder.Entity("Dicom.Entity.Identity.Role", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("Dicom.Entity.Identity.User", b =>
-                {
-                    b.Navigation("Dicoms");
                 });
 #pragma warning restore 612, 618
         }

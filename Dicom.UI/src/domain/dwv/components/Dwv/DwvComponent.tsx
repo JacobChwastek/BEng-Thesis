@@ -125,21 +125,64 @@ class DwvComponent extends React.Component<Props, State> {
 		);
 	}
 
-	componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>) {
 
-		/**
-		 * Remove DICOM
-		 */
-		if (prevProps.dicom.actions.restart != this.props.dicom.actions.restart && this.props.dicom.actions.restart) {
-			this.props.setRestartApp(false);
+	resetLayer = () => {
+		const layerController = this.state.dwvApp?.getLayerController();
+		const viewController = layerController?.getActiveViewLayer().getViewController();
 
-			//todo: temporary
-			// dwv.App().reset();
-			// this.state.dwvApp?.reset();
-			// this.showDropbox(this.state.dwvApp, true);
-			window.location.reload();
+		viewController.setCurrentFrame(0);
+		viewController.setCurrentSlice(0);
+	}
+
+
+	generatePdf = () => {
+		const { frames, slices, frameNo, sliceNo } = this.props.dicom.dicom;
+		const layerController = this.state.dwvApp?.getLayerController();
+		const viewController = layerController?.getActiveViewLayer().getViewController();
+
+		viewController.setCurrentFrame(0);
+		viewController.setCurrentSlice(0);
+
+
+		const hasFrames = (this.state.dwvApp?.getImage().getNumberOfFrames() !== 1);
+
+
+		for (let i = 0; i < slices; i++) {
+			const hasSlices = (this.state.dwvApp?.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);
+			const imageData = this.state.dwvApp?.getLayerController().getActiveViewLayer().getImageData();
+			const img  = encode([imageData.data.buffer], imageData.width, imageData.height, 0);
+			console.log("data:image/png;base64," + arrayBufferToBase64(img));
+			const stage = this.state.dwvApp?.getLayerController().getActiveDrawLayer().getKonvaStage();
+			console.log(stage);
+			const dataURL = stage.toDataURL();
+			console.log(dataURL);
+			console.log("-------------- ", i ,"----------------");
+			if (hasSlices) {
+				viewController.incrementSliceNb();
+			}
 		}
 
+
+		// var hasSlices =
+		// 	(app.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);
+		// var hasFrames = (app.getImage().getNumberOfFrames() !== 1);
+		// if (up) {
+		// 	if (hasSlices) {
+		// 		viewController.incrementSliceNb();
+		// 	} else if (hasFrames) {
+		// 		viewController.incrementFrameNb();
+		// 	}
+		// } else {
+		// 	if (hasSlices) {
+		// 		viewController.decrementSliceNb();
+		// 	} else if (hasFrames) {
+		// 		viewController.decrementFrameNb();
+		// 	}
+		// }
+		this.props.setGeneratePdf(false);
+	}
+
+	componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>) {
 		/**
 		 * Change tool
 		 */
@@ -159,7 +202,7 @@ class DwvComponent extends React.Component<Props, State> {
 			this.state.dwvApp?.resetZoom();
 			this.state.dwvApp?.resetDisplay();
 			this.state.dwvApp?.deleteDraws();
-
+			this.resetLayer()
 			this.props.setRestart(false);
 		}
 
@@ -168,7 +211,7 @@ class DwvComponent extends React.Component<Props, State> {
 		 */
 		if (prevProps.dicom.actions.generatePDF !== this.props.dicom.actions.generatePDF && this.props.dicom.actions.generatePDF) {
 
-
+			this.generatePdf();
 
 			console.log(this.state.dwvApp?.getImage());
 			const imageBuffer = this.state.dwvApp?.getImage().getBuffer();
@@ -184,12 +227,12 @@ class DwvComponent extends React.Component<Props, State> {
 			const img  = encode([imageData.data.buffer], imageData.width, imageData.height, 0);
 			console.log(img);
 
-			console.log(arrayBufferToBase64(img));
+			console.log("data:image/png;base64," + arrayBufferToBase64(img));
 
 			const stage = this.state.dwvApp?.getLayerController().getActiveDrawLayer().getKonvaStage();
 			const dataURL = stage.toDataURL();
 			console.log(dataURL);
-			this.props.setGeneratePdf(false);
+
 		}
 
 		/**
@@ -197,14 +240,6 @@ class DwvComponent extends React.Component<Props, State> {
 		 */
 		if (prevProps.dicom.actions.undo !== this.props.dicom.actions.undo) {
 			this.state.dwvApp?.undo();
-
-			console.log(this.state.dwvApp?.getLayerController());
-
-			const xd = this.state.dwvApp?.getLayerController().getActiveViewLayer().getViewController();
-			console.log(this.state.dwvApp?.getImage());
-
-			console.log((this.state.dwvApp?.getLayerController().getActiveDrawLayer() as any).getKonvaLayer());
-			console.log(this.state.dwvApp?.getLayerController().getActiveViewLayer().getImageData());
 		}
 
 		/**
@@ -249,7 +284,6 @@ class DwvComponent extends React.Component<Props, State> {
 
 		// set active slice
 		app.addEventListener("slicechange", (event: any) => {
-			console.log(event);
 			this.props.setActiveSlice(event.value[0]);
 		});
 
@@ -278,7 +312,7 @@ class DwvComponent extends React.Component<Props, State> {
 			const image = app.getImage();
 			const framesNo = image?.getNumberOfFrames();
 			this.props.setFrames(framesNo);
-			this.props.setSlices(image.getGeometry().getSize().getNumberOfSlices());
+			this.props.setSlices(image.getGeometry().getSize(framesNo).getNumberOfSlices());
 
 			if (app.isMonoSliceData() && framesNo === 1) {
 				selectedTool = "ZoomAndPan";

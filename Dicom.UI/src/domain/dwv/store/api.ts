@@ -1,9 +1,5 @@
 import {baseAPI} from 'infrastructure/persistance/api'
 
-// interface UploadFilesRequest {
-//  	files: FormData
-// }
-
 export const api = baseAPI.injectEndpoints({
 	endpoints: (builder) => ({
 		uploadDicom: builder.mutation<void, any>({
@@ -12,8 +8,17 @@ export const api = baseAPI.injectEndpoints({
 				method: 'POST',
 				body: body
 			})
+		}),
+		removeDicom: builder.mutation<void, { id: string }> ({
+			query: (params) => ({
+				url: 'dicom',
+				method: 'DELETE',
+				params: {
+					id: params.id
+				}
+			})
 		})
 	})
 })
 
-export const { useUploadDicomMutation } = api;
+export const { useUploadDicomMutation, useRemoveDicomMutation } = api;

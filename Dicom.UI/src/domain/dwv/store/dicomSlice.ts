@@ -16,7 +16,9 @@ export const initialState: IDicomState = {
 		slices: 0,
 		frameNo: 0,
 		frames: 0,
-		sliceNo: 0
+		sliceNo: 0,
+		serverUploaded: false,
+		dicomId: ""
 	},
 	dwv: {
 		versions: {
@@ -53,7 +55,8 @@ export const initialState: IDicomState = {
 		reset: false,
 		undo: 0,
 		restart: false,
-		generatePDF: false
+		generatePDF: false,
+		loading: false
 	}
 };
 
@@ -99,7 +102,9 @@ export const dicomSlice = createSlice({
 				slices: 0,
 				sliceNo: 0,
 				frames: 0,
-				frameNo: 0
+				frameNo: 0,
+				serverUploaded: false,
+				dicomId: ""
 			};
 		},
 		undo: (state) => {
@@ -125,6 +130,10 @@ export const dicomSlice = createSlice({
 		},
 		setGeneratePdf: (state, { payload }: PayloadAction<boolean>) => {
 			state.actions.generatePDF = payload;
+		},
+		setServerUpload: (state, { payload: { isUploaded, id } }: PayloadAction<{isUploaded: boolean, id: string}>) => {
+			state.dicom.serverUploaded = isUploaded;
+			state.dicom.dicomId = id
 		}
 	}
 });
@@ -147,5 +156,7 @@ export const {
 	setSelectedShape,
 	setRestartApp,
 	setRestart,
-	setGeneratePdf
+	setGeneratePdf,
+	setServerUpload,
+	setShape
 } = dicomSlice.actions;

@@ -13,7 +13,9 @@ namespace Dicom.Infrastructure.Persistence
 {
     public class Context: DbContext
     {
-        private static string GetConnectionString() => ConfigurationConstants.DBConnectionString;
+        // private static string GetConnectionString() => ConfigurationConstants.DbConnectionString;
+        private static string GetConnectionString() =>
+            "Host=localhost;Database=dicom;Username=postgres;Password=password;";
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder

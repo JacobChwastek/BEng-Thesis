@@ -1,5 +1,6 @@
 ﻿using System;
-using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Dicom.Application.Services;
@@ -8,7 +9,7 @@ using MediatR;
 namespace Dicom.Application.Commands.Dicom.UploadDicom
 {
 
-    public class UploadDicomCommandHandler : IRequestHandler<UploadDicomCommand>
+    public class UploadDicomCommandHandler : IRequestHandler<UploadDicomCommand, UploadDicomResponse>
     {
         private readonly IDicomService _dicomService;
 
@@ -17,12 +18,21 @@ namespace Dicom.Application.Commands.Dicom.UploadDicom
             _dicomService = dicomService;
         }
 
-        public async Task<Unit> Handle(UploadDicomCommand request, CancellationToken cancellationToken)
+        public async Task<UploadDicomResponse> Handle(UploadDicomCommand request, CancellationToken cancellationToken)
         {
+            try
+            {
+                var dicomId = await _dicomService.SaveDicom(request.File, request.UserId);
 
-            await _dicomService.SaveDicom(request.File);
-
-            return new Unit();
+                return new UploadDicomResponse()
+                {
+                    Id = dicomId
+                };
+            }
+            catch (Exception e)
+            {
+                throw new HttpRequestException("Unable to save dicom file", e, HttpStatusCode.BadRequest);
+            }
         }
     }
 }

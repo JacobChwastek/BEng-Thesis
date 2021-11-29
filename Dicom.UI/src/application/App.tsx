@@ -12,14 +12,14 @@ import "./App.scss"
 
 const App = () => {
 	const dispatch = useDispatch();
-	const [getUser, {}] = useUserMutation();
+	const [getUser] = useUserMutation();
 	const isAuth = useSelector((state: RootState) => state.auth.isAuth);
 	const user = useSelector((state: RootState) => state.auth.user);
 
 
 	useEffect(() => {
 		const verifyUser = async () => {
-			if (user.id.length == 0) {
+			if (user.id.length === 0) {
 				try {
 					const { user } = await getUser().unwrap() || {};
 					dispatch(setUser(user));

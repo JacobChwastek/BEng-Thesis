@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Dicom.Entity.Common;
 
 namespace Dicom.Entity.Identity
@@ -22,5 +23,8 @@ namespace Dicom.Entity.Identity
         public Role Role { get; set; }
 
         public Guid RoleId { get; set; }
+
+
+        public ICollection<Dicom.Dicom> Dicoms { get; set; }
     }
 }

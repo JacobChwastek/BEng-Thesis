@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Dicom.Application.Common.Exceptions;
 using Dicom.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
@@ -12,8 +13,10 @@ namespace Dicom.Application.Services
 {
     public interface IDicomService
     {
-        Task<Guid> SaveDicom(IFormFile file);
+        Task<Guid> SaveDicom(IFormFile file, Guid requestUserId);
         Task<object> LoadDicom();
+
+        Task RemoveDicomAsync(Guid id);
     }
 
     public class DicomService: IDicomService
@@ -49,11 +52,31 @@ namespace Dicom.Application.Services
             return result;
         }
 
+        public async Task RemoveDicomAsync(Guid id)
+        {
+            var dicom = await _dal.DicomRepositoryAsync
+                .FirstOrDefaultAsync(x => x.Id == id);
 
-        public async Task<Guid> SaveDicom(IFormFile file)
+            if (dicom is null || !File.Exists(dicom.Path))
+            {
+                throw new NotFoundException();
+            }
+
+            dicom.Deleted = true;
+            dicom.DeletedAt = DateTime.Now;
+            dicom.LastModifiedAt = DateTime.Now;
+            
+            File.Delete(dicom.Path);
+
+            await _dal.SaveChangesAsync();
+        }
+        
+        public async Task<Guid> SaveDicom(IFormFile file, Guid requestUserId)
         {
             var path = await _dal.VolumeRepositoryAsync.FirstOrDefaultAsync();
 
+            var user = await _dal.UserRepositoryAsync.FirstOrDefaultAsync(x => x.Id == requestUserId);
+            
             var directoryPath = path.Path + "\\Dicom\\";
 
             if (!Directory.Exists(directoryPath))
@@ -68,9 +91,9 @@ namespace Dicom.Application.Services
                 Id = dicomId,
                 FileName = file.FileName,
                 FileSize = file.Length,
-                Path = filePath
+                Path = filePath,
+                User = user
             };
-
             
             await using Stream fileStream = new FileStream(filePath, FileMode.Create);
             

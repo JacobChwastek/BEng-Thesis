@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Dicom.API.Extensions;
 using Dicom.Application.Commands.CreateUser;
 using Dicom.Application.Commands.Login;
 using Dicom.Application.Queries;
@@ -49,18 +49,21 @@ namespace Dicom.API.Controllers
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> FindAuthenticatedUser()
         {
-            var claimUserId = User.FindFirstValue(ClaimTypes.UserData);
-            var isUserIdValid = Guid.TryParse(claimUserId, out var userId);
+            var userId = User.GetUserId();
 
-            if (!isUserIdValid)
-                return NotFound();
-
-            var result = await Mediator.Send(new AuthUserInfoQuery() { UserId = userId });
-            return result != null ? Ok(result) : NotFound();
+            try
+            {
+                var result = await Mediator.Send(new AuthUserInfoQuery() { UserId = userId });
+                return result != null ? Ok(result) : NotFound();
+            }
+            catch (Exception e)
+            {
+                return BadRequest();
+            }
         }
 
         [HttpGet("get-user/{userid:guid}")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> FindUserByIdAsync([FromRoute] Guid userId)
         {
             var result = await Mediator.Send(new UserInfoQuery { UserId = userId });

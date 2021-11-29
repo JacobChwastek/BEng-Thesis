@@ -1,14 +1,23 @@
 import * as React from "react";
-import { Button, Col, Divider, Input, Layout, Row, Select, Statistic } from "antd";
-import { DeleteOutlined } from "@ant-design/icons";
+import { Button, Col, Divider, Input, Layout, Popover, Row, Select, Statistic } from "antd";
+import { CheckOutlined, CloseOutlined, DeleteOutlined } from "@ant-design/icons";
 import _ from "lodash";
 
 import { formatBytes } from "utils/Math";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "application/store/store";
-import { removeDicom, setSelectedShape, setSelectedTool, setShowDicomTags, undo, setRestart, setGeneratePdf } from "domain/dwv/store/dicomSlice";
+import {
+	setGeneratePdf,
+	setRestart,
+	setSelectedShape,
+	setSelectedTool,
+	setServerUpload,
+	setShowDicomTags,
+	undo
+} from "domain/dwv/store/dicomSlice";
 
 import "domain/dwv/components/Management/ManagementSider.scss";
+import { useRemoveDicomMutation } from "domain/dwv/store/api";
 
 const { Sider } = Layout;
 const { Option } = Select;
@@ -18,8 +27,10 @@ type Props = {};
 export const ManagementSider = () => {
 	const {
 		dwv: { dataLoaded, tools, selectedTool },
-		dicom: { fileName, fileSize, frames, frameNo, sliceNo, slices }
+		dicom: { fileName, fileSize, frames, frameNo, sliceNo, slices, serverUploaded, dicomId }
 	} = useSelector((state: RootState) => state.dicom);
+
+	const [remove] = useRemoveDicomMutation();
 
 	const dispatch = useDispatch();
 
@@ -50,8 +61,18 @@ export const ManagementSider = () => {
 				</Select>
 			);
 		}
-		// console.log(choosenTool);
 		return <></>;
+	};
+
+	const removeDicom = async () => {
+		try {
+			await remove({ id: dicomId }).unwrap();
+			dispatch(setServerUpload({ isUploaded: false, id: " " }));
+			dispatch(setRestart(true));
+			window.location.reload();
+		} finally {
+
+		}
 	};
 
 	return (
@@ -60,7 +81,8 @@ export const ManagementSider = () => {
 				<Divider></Divider>
 				<Row gutter={[24, 24]}>
 					<Col span={8}>
-						<Button className="management-sider__button" onClick={() => dispatch(setShowDicomTags(true))} disabled={!dataLoaded}>
+						<Button className="management-sider__button" onClick={() => dispatch(setShowDicomTags(true))}
+								disabled={!dataLoaded}>
 							Show tags
 						</Button>
 					</Col>
@@ -73,7 +95,7 @@ export const ManagementSider = () => {
 						<Button
 							className="management-sider__button"
 							icon={<DeleteOutlined />}
-							onClick={() => dispatch(removeDicom())}
+							onClick={() => removeDicom()}
 						>
 							Remove
 						</Button>
@@ -85,6 +107,15 @@ export const ManagementSider = () => {
 						>
 							Reset
 						</Button>
+					</Col>
+					<Col span={8} className="management-sider__status">
+						<Popover
+							content={serverUploaded ? "Pomyślnie zapisano plik" : "Nie powiadło się zapisuwanie pliku"}
+							trigger="hover">
+							{serverUploaded ? <CheckOutlined style={{ color: "#2a9d8f" }} /> :
+								<CloseOutlined style={{ color: "#e76f51" }} />}
+						</Popover>
+
 					</Col>
 				</Row>
 				<Divider>File</Divider>

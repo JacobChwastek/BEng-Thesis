@@ -1,0 +1,16 @@
+.tags-modal {
+  width: 80% !important;
+  height: 80% !important;
+
+  .ant-modal-content {
+    height: 80% !important;
+    width: 80% !important;
+    display: flex;
+    flex-direction: column;
+
+    .ant-modal-body {
+      display: flex;
+      flex: 1;
+    }
+  }
+}

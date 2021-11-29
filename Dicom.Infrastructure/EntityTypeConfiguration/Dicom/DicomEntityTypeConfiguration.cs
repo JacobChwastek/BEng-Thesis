@@ -23,6 +23,12 @@ namespace Dicom.Infrastructure.EntityTypeConfiguration.Dicom
                 .HasMany(x => x.DwvConfigurations)
                 .WithOne(x => x.Dicom)
                 .HasForeignKey(x => x.DicomId);
+
+            builder.Property(x => x.UserId).IsRequired();
+            
+            builder.HasOne(x => x.User)
+                .WithMany(x => x.Dicoms)
+                .HasForeignKey(x => x.UserId);
         }
     }
 }

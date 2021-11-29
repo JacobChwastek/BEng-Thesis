@@ -9,7 +9,6 @@ namespace Dicom.Entity.Dicom
 
         public string Configuration { get; set; }
 
-
         public Dicom Dicom { get; set; }
 
         public Guid? DicomId { get; set; }

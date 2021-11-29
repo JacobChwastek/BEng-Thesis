@@ -17,6 +17,14 @@
     width: 100% !important;
   }
 
+  &__status {
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    font-size: 20px;
+    text-align: center;
+  }
+
   &__content {
     display: flex;
     flex-direction: column;

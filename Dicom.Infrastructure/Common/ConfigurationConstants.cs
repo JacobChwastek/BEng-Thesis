@@ -5,7 +5,7 @@ namespace Dicom.Infrastructure.Common
 {
     internal static class ConfigurationConstants
     {
-        public static readonly string DBConnectionString = ("DefaultConnection").AppSettings();
+        public static readonly string DbConnectionString = ("DefaultConnection").AppSettings();
 
         public static string AppSettings(this string key, bool isConnectionString = true)
         {
