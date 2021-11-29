@@ -47,5 +47,7 @@ namespace Dicom.Infrastructure.Repositories
         public GenericRepositoryAsync<Entity.Dicom.Dicom> DicomRepositoryAsync => base.RepositoryAsync<Entity.Dicom.Dicom>();
         public GenericRepositoryAsync<Volume> VolumeRepositoryAsync => base.RepositoryAsync<Volume>();
         public GenericRepositoryAsync<DwvConfiguration> DwvConfigurationAsync => base.RepositoryAsync<DwvConfiguration>();
+        public GenericRepositoryAsync<DicomDocumentation> DicomDocumentationRepositoryAsync => base.RepositoryAsync<DicomDocumentation>();
+        public GenericRepositoryAsync<DocumentationImage> DocumentationImageRepositoryAsync => base.RepositoryAsync<DocumentationImage>();
     }
 }

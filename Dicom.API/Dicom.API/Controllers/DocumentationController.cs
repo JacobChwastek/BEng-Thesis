@@ -1,6 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Dicom.Application.Commands.Documentation.Generate;
+using Dicom.Application.Commands.Documentation.UploadDocumentationImages;
+using Dicom.Domain.DTO.Documentation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dicom.API.Controllers
@@ -20,6 +23,32 @@ namespace Dicom.API.Controllers
             {
                 FileDownloadName = "Invoice.pdf"
             };
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> UploadDocumentationImages(UploadDocumentationImagesDto request)
+        {
+            if (request is null) 
+                return BadRequest();
+  
+            if (request.DicomId == Guid.Empty) 
+                return BadRequest();
+
+            if (request.DrawLayerImgBase64 is null || request.ViewLayerImageBase64 is null)
+                return BadRequest();
+            
+            if (request.DrawLayerImgBase64.Length == 0 || request.ViewLayerImageBase64.Length == 0)
+                return BadRequest();
+
+            await Mediator.Send(new UploadDocumentationImagesCommandRequest()
+            {
+                DicomId = request.DicomId,
+                DrawLayerImgBase64 = request.DrawLayerImgBase64,
+                ViewLayerImageBase64 = request.ViewLayerImageBase64
+            });
+            
+            return Ok();
         }
     }
 }

@@ -22,6 +22,7 @@ namespace Dicom.Application
             services.AddTransient<IAuthentication, AuthenticationService>();
             services.AddTransient<IDicomService, DicomService>();
             services.AddTransient<IPdfService, PdfService>();
+            services.AddTransient<IDocumentationService, DocumentationService>();
 
             new DicomSetupBuilder()
                 .RegisterServices(s => s.AddFellowOakDicom())

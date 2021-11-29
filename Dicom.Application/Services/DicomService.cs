@@ -15,8 +15,9 @@ namespace Dicom.Application.Services
     {
         Task<Guid> SaveDicom(IFormFile file, Guid requestUserId);
         Task<object> LoadDicom();
-
         Task RemoveDicomAsync(Guid id);
+
+        bool Exists(Guid id);
     }
 
     public class DicomService: IDicomService
@@ -70,7 +71,10 @@ namespace Dicom.Application.Services
 
             await _dal.SaveChangesAsync();
         }
-        
+
+        public bool Exists(Guid id) => _dal.DicomRepositoryAsync.Any(x => x.Id == id);
+
+
         public async Task<Guid> SaveDicom(IFormFile file, Guid requestUserId)
         {
             var path = await _dal.VolumeRepositoryAsync.FirstOrDefaultAsync();
