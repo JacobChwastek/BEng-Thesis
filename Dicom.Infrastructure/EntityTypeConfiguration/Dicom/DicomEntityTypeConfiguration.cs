@@ -18,17 +18,23 @@ namespace Dicom.Infrastructure.EntityTypeConfiguration.Dicom
             builder
                 .Property(x => x.FileSize)
                 .IsRequired();
-
+            
+            builder.Property(x => x.UserId).IsRequired();
+            
+            
+            builder.HasOne(x => x.User)
+                .WithMany(x => x.Dicoms)
+                .HasForeignKey(x => x.UserId);
+            
             builder
                 .HasMany(x => x.DwvConfigurations)
                 .WithOne(x => x.Dicom)
                 .HasForeignKey(x => x.DicomId);
 
-            builder.Property(x => x.UserId).IsRequired();
-            
-            builder.HasOne(x => x.User)
-                .WithMany(x => x.Dicoms)
-                .HasForeignKey(x => x.UserId);
+            builder
+                .HasMany(x => x.Documentations)
+                .WithOne(x => x.Dicom)
+                .HasForeignKey(x => x.DicomId);
         }
     }
 }

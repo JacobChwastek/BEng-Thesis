@@ -29,5 +29,7 @@ namespace Dicom.Entity.Dicom
         public Guid UserId { get; set; }
         
         public ICollection<DwvConfiguration> DwvConfigurations { get; set; }
+
+        public ICollection<DicomDocumentation> Documentations { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 using Dicom.Entity.Common;
 
 namespace Dicom.Entity.Dicom

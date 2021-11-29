@@ -69,6 +69,78 @@ namespace Dicom.Infrastructure.Migrations
                     b.ToTable("dicom");
                 });
 
+            modelBuilder.Entity("Dicom.Entity.Dicom.DicomDocumentation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("boolean")
+                        .HasColumnName("deleted");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<Guid>("DicomId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("dicom_id");
+
+                    b.Property<DateTime?>("LastModifiedAt")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("last_modified_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_dicom_documentation");
+
+                    b.HasIndex("DicomId")
+                        .HasDatabaseName("ix_dicom_documentation_dicom_id");
+
+                    b.ToTable("dicom_documentation");
+                });
+
+            modelBuilder.Entity("Dicom.Entity.Dicom.DocumentationImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("DicomDocumentationId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("dicom_documentation_id");
+
+                    b.Property<string>("DrawLayerImage")
+                        .HasColumnType("text")
+                        .HasColumnName("draw_layer_image");
+
+                    b.Property<DateTime?>("LastModifiedAt")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("last_modified_at");
+
+                    b.Property<string>("ViewLayerImage")
+                        .HasColumnType("text")
+                        .HasColumnName("view_layer_image");
+
+                    b.HasKey("Id")
+                        .HasName("pk_documentation_image");
+
+                    b.HasIndex("DicomDocumentationId")
+                        .HasDatabaseName("ix_documentation_image_dicom_documentation_id");
+
+                    b.ToTable("documentation_image");
+                });
+
             modelBuilder.Entity("Dicom.Entity.Dicom.DwvConfiguration", b =>
                 {
                     b.Property<Guid>("Id")
@@ -259,6 +331,30 @@ namespace Dicom.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Dicom.Entity.Dicom.DicomDocumentation", b =>
+                {
+                    b.HasOne("Dicom.Entity.Dicom.Dicom", "Dicom")
+                        .WithMany("Documentations")
+                        .HasForeignKey("DicomId")
+                        .HasConstraintName("fk_dicom_documentation_dicom_dicom_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Dicom");
+                });
+
+            modelBuilder.Entity("Dicom.Entity.Dicom.DocumentationImage", b =>
+                {
+                    b.HasOne("Dicom.Entity.Dicom.DicomDocumentation", "DicomDocumentation")
+                        .WithMany("DocumentationImages")
+                        .HasForeignKey("DicomDocumentationId")
+                        .HasConstraintName("fk_documentation_image_dicom_documentation_dicom_documentation")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DicomDocumentation");
+                });
+
             modelBuilder.Entity("Dicom.Entity.Dicom.DwvConfiguration", b =>
                 {
                     b.HasOne("Dicom.Entity.Dicom.Dicom", "Dicom")
@@ -283,7 +379,14 @@ namespace Dicom.Infrastructure.Migrations
 
             modelBuilder.Entity("Dicom.Entity.Dicom.Dicom", b =>
                 {
+                    b.Navigation("Documentations");
+
                     b.Navigation("DwvConfigurations");
+                });
+
+            modelBuilder.Entity("Dicom.Entity.Dicom.DicomDocumentation", b =>
+                {
+                    b.Navigation("DocumentationImages");
                 });
 
             modelBuilder.Entity("Dicom.Entity.Identity.Role", b =>
