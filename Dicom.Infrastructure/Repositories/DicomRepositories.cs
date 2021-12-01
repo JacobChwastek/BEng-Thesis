@@ -14,7 +14,7 @@ namespace Dicom.Infrastructure.Repositories
 
         protected DAL()
         {
-            this._context = new Context();
+            _context = new Context();
         }
 
         private readonly Dictionary<Type, object> _genericRepos = new();
@@ -24,30 +24,25 @@ namespace Dicom.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public GenericRepositoryAsync<T> RepositoryAsync<T>() where T : class, IEntity
+        protected GenericRepositoryAsync<T> RepositoryAsync<T>() where T : class, IEntity
         {
-            if (!_genericRepos.TryGetValue(typeof(T), out object result))
-            {
-                result = new GenericRepositoryAsync<T>(_context);
-                _genericRepos.Add(typeof(T), result);
-            }
+            if (_genericRepos.TryGetValue(typeof(T), out var result)) 
+                return result as GenericRepositoryAsync<T>;
+            
+            result = new GenericRepositoryAsync<T>(_context);
+            _genericRepos.Add(typeof(T), result);
             return result as GenericRepositoryAsync<T>;
         }
     }
 
     public class DicomRepositories: DAL
     {
-        public DicomRepositories() : base()
-        {
-
-        }
-
-        public GenericRepositoryAsync<User> UserRepositoryAsync => base.RepositoryAsync<User>();
-        public GenericRepositoryAsync<Role> RoleRepositoryAsync => base.RepositoryAsync<Role>();
-        public GenericRepositoryAsync<Entity.Dicom.Dicom> DicomRepositoryAsync => base.RepositoryAsync<Entity.Dicom.Dicom>();
-        public GenericRepositoryAsync<Volume> VolumeRepositoryAsync => base.RepositoryAsync<Volume>();
-        public GenericRepositoryAsync<DwvConfiguration> DwvConfigurationAsync => base.RepositoryAsync<DwvConfiguration>();
-        public GenericRepositoryAsync<DicomDocumentation> DicomDocumentationRepositoryAsync => base.RepositoryAsync<DicomDocumentation>();
-        public GenericRepositoryAsync<DocumentationImage> DocumentationImageRepositoryAsync => base.RepositoryAsync<DocumentationImage>();
+        public GenericRepositoryAsync<User> UserRepositoryAsync => RepositoryAsync<User>();
+        public GenericRepositoryAsync<Role> RoleRepositoryAsync => RepositoryAsync<Role>();
+        public GenericRepositoryAsync<Entity.Dicom.Dicom> DicomRepositoryAsync => RepositoryAsync<Entity.Dicom.Dicom>();
+        public GenericRepositoryAsync<Volume> VolumeRepositoryAsync => RepositoryAsync<Volume>();
+        public GenericRepositoryAsync<DwvConfiguration> DwvConfigurationAsync => RepositoryAsync<DwvConfiguration>();
+        public GenericRepositoryAsync<DicomDocumentation> DicomDocumentationRepositoryAsync => RepositoryAsync<DicomDocumentation>();
+        public GenericRepositoryAsync<DocumentationImage> DocumentationImageRepositoryAsync => RepositoryAsync<DocumentationImage>();
     }
 }

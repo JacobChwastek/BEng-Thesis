@@ -19,7 +19,7 @@ import {
 	setRestart,
 	setRestartApp,
 	setSelectedShape,
-	setSelectedTool,
+	setSelectedTool, setServerUpload,
 	setShowDicomTags,
 	setSlices,
 	setToolMenuAnchorEl,
@@ -30,6 +30,7 @@ import { RootState } from "application/store/store";
 import "./DwvComponent.css";
 import { IDwvApp } from "domain/dwv/types";
 import { arrayBufferToBase64 } from "utils/Image";
+import { useUploadDocumentationImagesMutation } from "domain/dwv/store/api";
 
 
 // get element
@@ -69,6 +70,7 @@ const styles: any = (theme: any) => ({
 type Props = ConnectedProps<typeof connector> & {
 	onFileUpload: (files: FileList) => void;
 	classes?: any;
+	uploadDocumentationImage: any
 }
 
 type State = {
@@ -135,50 +137,34 @@ class DwvComponent extends React.Component<Props, State> {
 	}
 
 
-	generatePdf = () => {
-		const { frames, slices, frameNo, sliceNo } = this.props.dicom.dicom;
+	generatePdf = async () => {
+		const { frames, slices, frameNo, sliceNo, dicomId } = this.props.dicom.dicom;
 		const layerController = this.state.dwvApp?.getLayerController();
 		const viewController = layerController?.getActiveViewLayer().getViewController();
+
 
 		viewController.setCurrentFrame(0);
 		viewController.setCurrentSlice(0);
 
-
 		const hasFrames = (this.state.dwvApp?.getImage().getNumberOfFrames() !== 1);
-
 
 		for (let i = 0; i < slices; i++) {
 			const hasSlices = (this.state.dwvApp?.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);
 			const imageData = this.state.dwvApp?.getLayerController().getActiveViewLayer().getImageData();
 			const img  = encode([imageData.data.buffer], imageData.width, imageData.height, 0);
-			console.log("data:image/png;base64," + arrayBufferToBase64(img));
+			console.log();
 			const stage = this.state.dwvApp?.getLayerController().getActiveDrawLayer().getKonvaStage();
 			console.log(stage);
 			const dataURL = stage.toDataURL();
 			console.log(dataURL);
 			console.log("-------------- ", i ,"----------------");
+			await this.props.uploadDocumentationImage({ dicomId, drawLayerImgBase64: dataURL, viewLayerImageBase64: "data:image/png;base64," + arrayBufferToBase64(img) }).unwrap();
+
 			if (hasSlices) {
 				viewController.incrementSliceNb();
 			}
 		}
-
-
-		// var hasSlices =
-		// 	(app.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);
-		// var hasFrames = (app.getImage().getNumberOfFrames() !== 1);
-		// if (up) {
-		// 	if (hasSlices) {
-		// 		viewController.incrementSliceNb();
-		// 	} else if (hasFrames) {
-		// 		viewController.incrementFrameNb();
-		// 	}
-		// } else {
-		// 	if (hasSlices) {
-		// 		viewController.decrementSliceNb();
-		// 	} else if (hasFrames) {
-		// 		viewController.decrementFrameNb();
-		// 	}
-		// }
+		
 		this.props.setGeneratePdf(false);
 	}
 
@@ -213,25 +199,25 @@ class DwvComponent extends React.Component<Props, State> {
 
 			this.generatePdf();
 
-			console.log(this.state.dwvApp?.getImage());
-			const imageBuffer = this.state.dwvApp?.getImage().getBuffer();
-
-			console.log(imageBuffer);
-
-			const imageData = this.state.dwvApp?.getLayerController().getActiveViewLayer().getImageData();
-			console.log(imageData);
-			console.log(imageData.data);
-			console.log(imageData.width);
-			console.log(this.state.dwvApp?.getLayerController());
-
-			const img  = encode([imageData.data.buffer], imageData.width, imageData.height, 0);
-			console.log(img);
-
-			console.log("data:image/png;base64," + arrayBufferToBase64(img));
-
-			const stage = this.state.dwvApp?.getLayerController().getActiveDrawLayer().getKonvaStage();
-			const dataURL = stage.toDataURL();
-			console.log(dataURL);
+			// console.log(this.state.dwvApp?.getImage());
+			// const imageBuffer = this.state.dwvApp?.getImage().getBuffer();
+			//
+			// console.log(imageBuffer);
+			//
+			// const imageData = this.state.dwvApp?.getLayerController().getActiveViewLayer().getImageData();
+			// console.log(imageData);
+			// console.log(imageData.data);
+			// console.log(imageData.width);
+			// console.log(this.state.dwvApp?.getLayerController());
+			//
+			// const img  = encode([imageData.data.buffer], imageData.width, imageData.height, 0);
+			// console.log(img);
+			//
+			// console.log("data:image/png;base64," + arrayBufferToBase64(img));
+			//
+			// const stage = this.state.dwvApp?.getLayerController().getActiveDrawLayer().getKonvaStage();
+			// const dataURL = stage.toDataURL();
+			// console.log(dataURL);
 
 		}
 
@@ -584,9 +570,15 @@ const mapDispatchToProps = {
 	setSelectedShape,
 	setRestartApp,
 	setRestart,
-	setGeneratePdf
+	setGeneratePdf,
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-export default withStyles(styles)(connector(DwvComponent));
+const RTK = (props: any) => {
+	const [uploadDocumentationImage] = useUploadDocumentationImagesMutation();
+
+	return <DwvComponent uploadDocumentationImage={uploadDocumentationImage} {...props} />
+}
+
+export default withStyles(styles)(connector(RTK));

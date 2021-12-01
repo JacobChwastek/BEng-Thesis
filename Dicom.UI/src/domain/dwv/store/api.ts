@@ -1,5 +1,12 @@
 import {baseAPI} from 'infrastructure/persistance/api'
 
+
+interface IUploadDocumentationImagesRequest {
+	dicomId: string,
+	drawLayerImgBase64: string,
+	viewLayerImageBase64: string
+}
+
 export const api = baseAPI.injectEndpoints({
 	endpoints: (builder) => ({
 		uploadDicom: builder.mutation<void, any>({
@@ -17,8 +24,15 @@ export const api = baseAPI.injectEndpoints({
 					id: params.id
 				}
 			})
+		}),
+		uploadDocumentationImages: builder.mutation<void, IUploadDocumentationImagesRequest>({
+			query: (body) => ({
+				url: "documentation/upload-documentation-images",
+				method: 'POST',
+				body
+			})
 		})
 	})
 })
 
-export const { useUploadDicomMutation, useRemoveDicomMutation } = api;
+export const { useUploadDicomMutation, useRemoveDicomMutation, useUploadDocumentationImagesMutation } = api;

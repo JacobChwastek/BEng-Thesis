@@ -3,15 +3,17 @@ using System;
 using Dicom.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace Dicom.Infrastructure.Migrations
 {
     [DbContext(typeof(Context))]
-    partial class ContextModelSnapshot : ModelSnapshot
+    [Migration("20211130170413_DocumentationConfigurations")]
+    partial class DocumentationConfigurations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,7 +118,7 @@ namespace Dicom.Infrastructure.Migrations
                         .HasColumnType("timestamp without time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<Guid?>("DicomDocumentationId")
+                    b.Property<Guid>("DicomDocumentationId")
                         .HasColumnType("uuid")
                         .HasColumnName("dicom_documentation_id");
 
@@ -350,7 +352,9 @@ namespace Dicom.Infrastructure.Migrations
                     b.HasOne("Dicom.Entity.Dicom.DicomDocumentation", "DicomDocumentation")
                         .WithMany("DocumentationImages")
                         .HasForeignKey("DicomDocumentationId")
-                        .HasConstraintName("fk_documentation_images_dicom_documentations_dicom_documentati");
+                        .HasConstraintName("fk_documentation_images_dicom_documentations_dicom_documentati")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("DicomDocumentation");
                 });

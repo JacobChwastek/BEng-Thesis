@@ -368,4 +368,5 @@ FodyWeavers.xsd
 
 Assets/**/*
 Dicom.API/Dicom.API/.local-chromium/*
+Dicom.Domain/Dicom.Domain/Assets/*
 

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Dicom.Application.Common.Exceptions;
 using Dicom.Application.Services;
@@ -6,8 +7,7 @@ using MediatR;
 
 namespace Dicom.Application.Commands.Documentation.UploadDocumentationImages
 {
-    public class UploadDocumentationImagesCommandHandler : IRequestHandler<UploadDocumentationImagesCommandRequest,
-        UploadDocumentationImagesResponse>
+    public class UploadDocumentationImagesCommandHandler : IRequestHandler<UploadDocumentationImagesCommandRequest, UploadDocumentationImagesResponse>
     {
         private readonly IDicomService _dicomService;
         private readonly IDocumentationService _documentationService;
@@ -22,16 +22,22 @@ namespace Dicom.Application.Commands.Documentation.UploadDocumentationImages
         public async Task<UploadDocumentationImagesResponse> Handle(UploadDocumentationImagesCommandRequest request,
             CancellationToken cancellationToken)
         {
-            if (!_dicomService.Exists(request.DicomId))
-                throw new NotFoundException();
+            try
+            {
+                if (!_dicomService.Exists(request.DicomId))
+                    throw new NotFoundException();
 
-            var documentationId = await _documentationService.CreateDocumentation(request.DicomId);
+                var documentationId = await _documentationService.CreateDocumentation(request.DicomId);
 
-            await _documentationService.AddDocumentationImages(documentationId, request.DrawLayerImgBase64,
-                request.ViewLayerImageBase64);
-
-
-            return default;
+                await _documentationService.AddDocumentationImages(documentationId, request.DrawLayerImgBase64, request.ViewLayerImageBase64);
+                
+                return default;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }

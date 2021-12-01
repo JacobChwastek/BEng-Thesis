@@ -26,7 +26,7 @@ namespace Dicom.API.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost("upload-documentation-images")]
         public async Task<IActionResult> UploadDocumentationImages(UploadDocumentationImagesDto request)
         {
             if (request is null) 

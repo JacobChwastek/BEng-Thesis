@@ -14,6 +14,7 @@ namespace Dicom.Infrastructure.EntityTypeConfiguration.Dicom
             builder.Property(x => x.DrawLayerImage).IsRequired();
             
             builder.Property(x => x.ViewLayerImage).IsRequired();
+            
         }
     }
 }

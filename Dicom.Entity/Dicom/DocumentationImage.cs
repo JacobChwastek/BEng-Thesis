@@ -14,7 +14,7 @@ namespace Dicom.Entity.Dicom
 
         public DicomDocumentation DicomDocumentation { get; set; }
 
-        public Guid DicomDocumentationId { get; set; }
+        public Guid? DicomDocumentationId { get; set; }
         
     }
 }

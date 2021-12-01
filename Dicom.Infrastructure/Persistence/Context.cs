@@ -40,12 +40,20 @@ namespace Dicom.Infrastructure.Persistence
 
             //dwvConfiguration
             new DwvConfigurationEntityTypeConfiguration().Configure(builder.Entity<DwvConfiguration>());
+            
+            //documentationImage
+            new DicomDocumentationTypeConfiguration().Configure(builder.Entity<DicomDocumentation>());
+            
+            //dicomDocumentation
+            new DocumentationImageTypeConfiguration().Configure(builder.Entity<DocumentationImage>());
+            
         }
-
-
+        
         public DbSet<Volume> Volumes { get; set; }
         public DbSet<DwvConfiguration> DwvConfigurations { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
+        public DbSet<DicomDocumentation> DicomDocumentations { get; set; }
+        public DbSet<DocumentationImage> DocumentationImages { get; set; }
     }
 }

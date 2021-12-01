@@ -16,9 +16,8 @@ namespace Dicom.Infrastructure.EntityTypeConfiguration.Dicom
                 .WithOne(x => x.DicomDocumentation)
                 .HasForeignKey(x => x.DicomDocumentationId);
 
-            builder.Property(x => x.DeletedAt)
-                .HasDefaultValue(false);
-            
+            builder.Property(x => x.DeletedAt);
+
         }
     }
 }
