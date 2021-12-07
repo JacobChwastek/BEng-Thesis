@@ -19,19 +19,21 @@ namespace Dicom.Application.Commands.Documentation.UploadDocumentationImages
             _documentationService = documentationService;
         }
 
-        public async Task<UploadDocumentationImagesResponse> Handle(UploadDocumentationImagesCommandRequest request,
-            CancellationToken cancellationToken)
+        public async Task<UploadDocumentationImagesResponse> Handle(UploadDocumentationImagesCommandRequest request, CancellationToken cancellationToken)
         {
             try
             {
                 if (!_dicomService.Exists(request.DicomId))
                     throw new NotFoundException();
 
-                var documentationId = await _documentationService.CreateDocumentation(request.DicomId);
+                var documentationId =request.DocumentationId ?? await _documentationService.CreateDocumentation(request.DicomId);
 
-                await _documentationService.AddDocumentationImages(documentationId, request.DrawLayerImgBase64, request.ViewLayerImageBase64);
-                
-                return default;
+                var id = await _documentationService.AddDocumentationImages(documentationId, request.DrawLayerImgBase64, request.ViewLayerImageBase64);
+
+                return new UploadDocumentationImagesResponse()
+                {
+                    Id = id
+                };
             }
             catch (Exception e)
             {

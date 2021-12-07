@@ -21,4 +21,8 @@
     <ProjectReference Include="..\..\Dicom.Infrastructure\Dicom.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="patternMatchingClassDiagram.cd" />
+  </ItemGroup>
+
 </Project>

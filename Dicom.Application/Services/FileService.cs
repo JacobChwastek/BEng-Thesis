@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Dicom.Application.Services
 {
@@ -7,6 +10,8 @@ namespace Dicom.Application.Services
     {
         void SaveBase64ToFile(string fileName, string file);
         void SaveBytesToFile(string filename, byte[] bytesToWrite);
+
+        Task<MemoryStream> GetFileAsync(string path);
     }
     
     public class FileService: IFileService
@@ -31,6 +36,17 @@ namespace Dicom.Application.Services
             file.Write(bytesToWrite, 0, bytesToWrite.Length);
 
             file.Close();
+        }
+
+        public async Task<MemoryStream> GetFileAsync(string path)
+        {
+            var memory = new MemoryStream();
+            await using (var stream = new FileStream(path, FileMode.Open))
+            {
+                await stream.CopyToAsync(memory);
+            }
+            memory.Position = 0;
+            return memory;
         }
     }
 }

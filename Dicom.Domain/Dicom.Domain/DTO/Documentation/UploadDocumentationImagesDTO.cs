@@ -4,6 +4,9 @@ namespace Dicom.Domain.DTO.Documentation
 {
     public class UploadDocumentationImagesDto
     {
+
+        public Guid? DocumentationId { get; set; }
+        
         public Guid DicomId { get; set; }
 
         public string DrawLayerImgBase64 { get; set; }

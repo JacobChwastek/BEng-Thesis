@@ -10,6 +10,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dicom.API", "Dicom.API\Dicom.API\Dicom.API.csproj", "{D9AC15BF-6EDD-463C-9CBD-E9F01FB432EF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{8EA2B97E-E75C-4F1B-9C8E-6BCC668FFE39}"
+	ProjectSection(SolutionItems) = preProject
+		Graph1.dgml = Graph1.dgml
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dicom.Application", "Dicom.Application\Dicom.Application.csproj", "{A4063958-9624-4D4F-AC4A-BD6A1FFF2664}"
 EndProject
@@ -47,11 +50,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BAF2F4D8-3C9E-4B67-B288-6D179EAF02F4}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		patternMatchingClassDiagram.cd = patternMatchingClassDiagram.cd
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{B3E61AEC-3358-4602-9000-67362F82074F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dicom.Test", "Dicom.Test\Dicom.Test.csproj", "{6370D19F-D261-41BE-B5A5-0CC8BFEB7FA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dicom.Test", "Dicom.Test\Dicom.Test.csproj", "{6370D19F-D261-41BE-B5A5-0CC8BFEB7FA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

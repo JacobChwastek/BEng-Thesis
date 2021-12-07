@@ -1,4 +1,4 @@
-import {baseAPI} from 'infrastructure/persistance/api'
+import { baseAPI } from "infrastructure/persistance/api";
 
 
 interface IUploadDocumentationImagesRequest {
@@ -11,28 +11,28 @@ export const api = baseAPI.injectEndpoints({
 	endpoints: (builder) => ({
 		uploadDicom: builder.mutation<void, any>({
 			query: (body) => ({
-				url: 'dicom/upload-dicom',
-				method: 'POST',
+				url: "dicom/upload-dicom",
+				method: "POST",
 				body: body
 			})
 		}),
-		removeDicom: builder.mutation<void, { id: string }> ({
+		removeDicom: builder.mutation<void, { id: string }>({
 			query: (params) => ({
-				url: 'dicom',
-				method: 'DELETE',
+				url: "dicom",
+				method: "DELETE",
 				params: {
 					id: params.id
 				}
 			})
 		}),
-		uploadDocumentationImages: builder.mutation<void, IUploadDocumentationImagesRequest>({
+		uploadDocumentationImages: builder.mutation<{ id: string, documentationId?: string }, IUploadDocumentationImagesRequest>({
 			query: (body) => ({
 				url: "documentation/upload-documentation-images",
-				method: 'POST',
+				method: "POST",
 				body
 			})
-		})
+		}),
 	})
-})
+});
 
 export const { useUploadDicomMutation, useRemoveDicomMutation, useUploadDocumentationImagesMutation } = api;

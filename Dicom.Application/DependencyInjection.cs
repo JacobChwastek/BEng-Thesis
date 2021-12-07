@@ -24,12 +24,12 @@ namespace Dicom.Application
             services.AddTransient<IPdfService, PdfService>();
             services.AddTransient<IDocumentationService, DocumentationService>();
             services.AddTransient<IFileService, FileService>();
+            services.AddTransient<IHtmlService, HtmlService>();
 
             new DicomSetupBuilder()
                 .RegisterServices(s => s.AddFellowOakDicom())
                 .Build();
-
-
+            
             return services;
         }
     }

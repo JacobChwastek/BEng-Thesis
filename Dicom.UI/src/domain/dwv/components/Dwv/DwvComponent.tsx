@@ -2,7 +2,7 @@ import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 // @ts-ignore
 import dwv from "dwv";
-import {encode} from 'upng-js'
+import { encode } from "upng-js";
 
 import { withStyles } from "@material-ui/core/styles";
 import LinearProgress from "@material-ui/core/LinearProgress";
@@ -19,7 +19,7 @@ import {
 	setRestart,
 	setRestartApp,
 	setSelectedShape,
-	setSelectedTool, setServerUpload,
+	setSelectedTool,
 	setShowDicomTags,
 	setSlices,
 	setToolMenuAnchorEl,
@@ -31,6 +31,7 @@ import "./DwvComponent.css";
 import { IDwvApp } from "domain/dwv/types";
 import { arrayBufferToBase64 } from "utils/Image";
 import { useUploadDocumentationImagesMutation } from "domain/dwv/store/api";
+import { api } from "infrastructure/persistance/axios";
 
 
 // get element
@@ -70,7 +71,7 @@ const styles: any = (theme: any) => ({
 type Props = ConnectedProps<typeof connector> & {
 	onFileUpload: (files: FileList) => void;
 	classes?: any;
-	uploadDocumentationImage: any
+	uploadDocumentationImage: any,
 }
 
 type State = {
@@ -134,7 +135,7 @@ class DwvComponent extends React.Component<Props, State> {
 
 		viewController.setCurrentFrame(0);
 		viewController.setCurrentSlice(0);
-	}
+	};
 
 
 	generatePdf = async () => {
@@ -142,31 +143,59 @@ class DwvComponent extends React.Component<Props, State> {
 		const layerController = this.state.dwvApp?.getLayerController();
 		const viewController = layerController?.getActiveViewLayer().getViewController();
 
+		console.log("Generate");
 
 		viewController.setCurrentFrame(0);
 		viewController.setCurrentSlice(0);
 
 		const hasFrames = (this.state.dwvApp?.getImage().getNumberOfFrames() !== 1);
+		let documentationId: null | string = null;
 
 		for (let i = 0; i < slices; i++) {
 			const hasSlices = (this.state.dwvApp?.getImage().getGeometry().getSize().getNumberOfSlices() !== 1);
 			const imageData = this.state.dwvApp?.getLayerController().getActiveViewLayer().getImageData();
-			const img  = encode([imageData.data.buffer], imageData.width, imageData.height, 0);
-			console.log();
+			const img = encode([imageData.data.buffer], imageData.width, imageData.height, 0);
+
 			const stage = this.state.dwvApp?.getLayerController().getActiveDrawLayer().getKonvaStage();
-			console.log(stage);
 			const dataURL = stage.toDataURL();
-			console.log(dataURL);
-			console.log("-------------- ", i ,"----------------");
-			await this.props.uploadDocumentationImage({ dicomId, drawLayerImgBase64: dataURL, viewLayerImageBase64: "data:image/png;base64," + arrayBufferToBase64(img) }).unwrap();
+
+
+			const result: any = await this.props.uploadDocumentationImage({
+				documentationId,
+				dicomId,
+				drawLayerImgBase64: dataURL,
+				viewLayerImageBase64: "data:image/png;base64," + arrayBufferToBase64(img)
+			}).unwrap();
+
+			documentationId = result?.id;
+
+			if(i == slices-1) {
+				try {
+					const { data } = await api.get<any>(`documentation?id=${dicomId}`, {
+						responseType: "blob"
+					});
+
+					const url = window.URL.createObjectURL(data);
+					const a = document.createElement("a");
+					document.body.appendChild(a);
+					a.href = url;
+					a.target = "_blank"
+					a.click();
+				}
+				catch (e) {
+				
+				}
+				finally {
+					this.props.setGeneratePdf(false);
+				}
+			}
 
 			if (hasSlices) {
 				viewController.incrementSliceNb();
 			}
 		}
-		
-		this.props.setGeneratePdf(false);
-	}
+
+	};
 
 	componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>) {
 		/**
@@ -188,7 +217,7 @@ class DwvComponent extends React.Component<Props, State> {
 			this.state.dwvApp?.resetZoom();
 			this.state.dwvApp?.resetDisplay();
 			this.state.dwvApp?.deleteDraws();
-			this.resetLayer()
+			this.resetLayer();
 			this.props.setRestart(false);
 		}
 
@@ -570,7 +599,7 @@ const mapDispatchToProps = {
 	setSelectedShape,
 	setRestartApp,
 	setRestart,
-	setGeneratePdf,
+	setGeneratePdf
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -578,7 +607,7 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 const RTK = (props: any) => {
 	const [uploadDocumentationImage] = useUploadDocumentationImagesMutation();
 
-	return <DwvComponent uploadDocumentationImage={uploadDocumentationImage} {...props} />
-}
+	return <DwvComponent uploadDocumentationImage={uploadDocumentationImage}  {...props} />;
+};
 
 export default withStyles(styles)(connector(RTK));
