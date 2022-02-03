@@ -28,7 +28,11 @@ export const initialState: IDicomState = {
 		tools: {
 			Opacity: {},
 			Livewire: {},
-			Filter: {},
+			Filter: {
+				options: ["Treshhold", "Sharpen", "Sobel"],
+				type: "factory",
+				events: ["filterrun", "filterundo"]
+			},
 			Floodfill: {},
 			Scroll: {},
 			ZoomAndPan: {},
@@ -39,11 +43,25 @@ export const initialState: IDicomState = {
 				events: ["drawcreate", "drawchange", "drawmove", "drawdelete"]
 			}
 		},
+		parameters: {
+			opacity: 1,
+			windowLevel: {
+				center: 0,
+				width: 0
+			},
+			zoom: 0,
+			offset: {
+				x: 0,
+				y: 0
+			}
+		},
 		toolNames: [],
+		selectedFilter: "",
 		selectedTool: "Select Tool",
 		loadProgress: 0,
 		dataLoaded: false,
 		metaData: [],
+		selectedWindowLevelMap: '',
 		showDicomTags: false,
 		toolMenuAnchorEl: null,
 		dropboxClassName: "dropBox",
@@ -91,8 +109,14 @@ export const dicomSlice = createSlice({
 		setToolMenuAnchorEl: (state, { payload }: PayloadAction<any>) => {
 			state.dwv.toolMenuAnchorEl = payload;
 		},
+		setFilter: (state, { payload }: PayloadAction<string>) => {
+			state.dwv.selectedFilter = payload;
+		},
 		removeDicom: (state) => {
 			state.actions.restart = true;
+		},
+		setSelectedWindowLevelMap: (state, { payload }: PayloadAction<string>) => {
+			state.dwv.selectedWindowLevelMap = payload;
 		},
 		uploadDicom: (state, { payload: { fileSize, fileName } }: PayloadAction<IUploadDicomPayload>) => {
 			state.dicom = {
@@ -109,6 +133,12 @@ export const dicomSlice = createSlice({
 		},
 		undo: (state) => {
 			state.actions.undo++;
+		},
+		setZoom: (state, { payload }: PayloadAction<number>) => {
+			state.dwv.parameters.zoom = payload;
+		},
+		setOffset: (state, { payload }: PayloadAction<{ x: number, y: number }>) => {
+			state.dwv.parameters.offset = payload;
 		},
 		setRestartApp: (state, { payload }: PayloadAction<boolean>) => {
 			state.actions.restart = payload;
@@ -131,9 +161,17 @@ export const dicomSlice = createSlice({
 		setGeneratePdf: (state, { payload }: PayloadAction<boolean>) => {
 			state.actions.generatePDF = payload;
 		},
-		setServerUpload: (state, { payload: { isUploaded, id } }: PayloadAction<{isUploaded: boolean, id: string}>) => {
+		setServerUpload: (state, {
+			payload: {
+				isUploaded,
+				id
+			}
+		}: PayloadAction<{ isUploaded: boolean, id: string }>) => {
 			state.dicom.serverUploaded = isUploaded;
-			state.dicom.dicomId = id
+			state.dicom.dicomId = id;
+		},
+		setWindowLevel: (state, { payload }: PayloadAction<{ center: number, width: number }>) => {
+			state.dwv.parameters.windowLevel = payload;
 		}
 	}
 });
@@ -158,5 +196,10 @@ export const {
 	setRestart,
 	setGeneratePdf,
 	setServerUpload,
-	setShape
+	setShape,
+	setFilter,
+	setZoom,
+	setOffset,
+	setWindowLevel,
+	setSelectedWindowLevelMap
 } = dicomSlice.actions;

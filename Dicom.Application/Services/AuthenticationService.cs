@@ -107,7 +107,7 @@ namespace Dicom.Application.Services
             return await GenerateAuthenticationResponseForUserAsync(newUser);
         }
 
-        private static bool CheckPasswordAsync(string hashPassword, string salt, string password) => HashVerify.VerifyHashString(hashPassword, salt, password);
+        public static bool CheckPasswordAsync(string hashPassword, string salt, string password) => HashVerify.VerifyHashString(hashPassword, salt, password);
         
 
         private Task<AuthenticationResponse> GenerateAuthenticationResponseForUserAsync(User user)
@@ -143,7 +143,7 @@ namespace Dicom.Application.Services
             });
         }
 
-        private static (string, string) GenerateHashPasswordAndSalt(string password)
+        public static (string, string) GenerateHashPasswordAndSalt(string password)
         {
             return HashVerify.GenerateHashString(password);
         }

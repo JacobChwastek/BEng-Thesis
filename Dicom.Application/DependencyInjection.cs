@@ -25,6 +25,7 @@ namespace Dicom.Application
             services.AddTransient<IDocumentationService, DocumentationService>();
             services.AddTransient<IFileService, FileService>();
             services.AddTransient<IHtmlService, HtmlService>();
+            services.AddTransient<IUserService, UserService>();
 
             new DicomSetupBuilder()
                 .RegisterServices(s => s.AddFellowOakDicom())

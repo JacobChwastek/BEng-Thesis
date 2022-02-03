@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31515.178
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{E1F48336-78FC-4287-98F0-7131B1DFEE43}"
 EndProject
@@ -10,9 +10,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dicom.API", "Dicom.API\Dicom.API\Dicom.API.csproj", "{D9AC15BF-6EDD-463C-9CBD-E9F01FB432EF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{8EA2B97E-E75C-4F1B-9C8E-6BCC668FFE39}"
-	ProjectSection(SolutionItems) = preProject
-		Graph1.dgml = Graph1.dgml
-	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dicom.Application", "Dicom.Application\Dicom.Application.csproj", "{A4063958-9624-4D4F-AC4A-BD6A1FFF2664}"
 EndProject
@@ -44,18 +41,16 @@ Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Dicom.UI", "Dicom.UI\", "{6
 		Release.AspNetCompiler.FixedNames = "false"
 		Release.AspNetCompiler.Debug = "False"
 		VWDPort = "51261"
-		SlnRelativePath = "Dicom.UI\"
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BAF2F4D8-3C9E-4B67-B288-6D179EAF02F4}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		patternMatchingClassDiagram.cd = patternMatchingClassDiagram.cd
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{B3E61AEC-3358-4602-9000-67362F82074F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dicom.Test", "Dicom.Test\Dicom.Test.csproj", "{6370D19F-D261-41BE-B5A5-0CC8BFEB7FA4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dicom.Test", "Dicom.Test\Dicom.Test\Dicom.Test.csproj", "{B3DFEE99-0A57-4A33-AD41-FE334A559186}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,10 +82,10 @@ Global
 		{61E5DA8D-A68A-44D7-8F06-3643C9FC46DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{61E5DA8D-A68A-44D7-8F06-3643C9FC46DB}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{61E5DA8D-A68A-44D7-8F06-3643C9FC46DB}.Release|Any CPU.Build.0 = Debug|Any CPU
-		{6370D19F-D261-41BE-B5A5-0CC8BFEB7FA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6370D19F-D261-41BE-B5A5-0CC8BFEB7FA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6370D19F-D261-41BE-B5A5-0CC8BFEB7FA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6370D19F-D261-41BE-B5A5-0CC8BFEB7FA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3DFEE99-0A57-4A33-AD41-FE334A559186}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3DFEE99-0A57-4A33-AD41-FE334A559186}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3DFEE99-0A57-4A33-AD41-FE334A559186}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3DFEE99-0A57-4A33-AD41-FE334A559186}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,7 +97,7 @@ Global
 		{B16F0640-5249-416B-BF79-E6D0D8D188FB} = {FDC88A00-1E49-4ABA-9FD2-FBE28892A8FE}
 		{85CE3CD6-1D27-4DD3-B1C6-FA49B9CD7A24} = {E1F48336-78FC-4287-98F0-7131B1DFEE43}
 		{61E5DA8D-A68A-44D7-8F06-3643C9FC46DB} = {98D5E0CF-A85A-4013-8B6A-BFC049609FBE}
-		{6370D19F-D261-41BE-B5A5-0CC8BFEB7FA4} = {B3E61AEC-3358-4602-9000-67362F82074F}
+		{B3DFEE99-0A57-4A33-AD41-FE334A559186} = {B3E61AEC-3358-4602-9000-67362F82074F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {946EA51F-329F-4165-99B5-E3523332E938}

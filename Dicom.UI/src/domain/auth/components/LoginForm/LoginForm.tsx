@@ -15,7 +15,6 @@ import { SubmitButton } from "ui/Button/SubmitButton";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 
 import "./LoginForm.scss";
-import { QueryStatus } from "@reduxjs/toolkit/query";
 import { useState } from "react";
 
 const { Text } = Typography;

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Button, Col, Divider, Input, Layout, Popover, Row, Select, Statistic } from "antd";
+import { Button, Col, Divider, Layout, Popover, Row, Select, Statistic } from "antd";
 import { CheckOutlined, CloseOutlined, DeleteOutlined } from "@ant-design/icons";
 import _ from "lodash";
 
@@ -7,10 +7,12 @@ import { formatBytes } from "utils/Math";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "application/store/store";
 import {
+	setFilter,
 	setGeneratePdf,
 	setRestart,
 	setSelectedShape,
 	setSelectedTool,
+	setSelectedWindowLevelMap,
 	setServerUpload,
 	setShowDicomTags,
 	undo
@@ -26,7 +28,13 @@ type Props = {};
 
 export const ManagementSider = () => {
 	const {
-		dwv: { dataLoaded, tools, selectedTool },
+		dwv: {
+			dataLoaded,
+			tools,
+			selectedTool,
+			parameters: { opacity, zoom, offset, windowLevel },
+			selectedWindowLevelMap
+		},
 		dicom: { fileName, fileSize, frames, frameNo, sliceNo, slices, serverUploaded, dicomId }
 	} = useSelector((state: RootState) => state.dicom);
 
@@ -40,7 +48,6 @@ export const ManagementSider = () => {
 		const [key, options] = Object.entries(tools).find(([key]) => key === selectedTool) || [];
 
 		if (!_.isEmpty(options) && options !== undefined) {
-
 			if (key === "Draw") {
 				return (
 					<Select className="management-sider__select" defaultValue={(options as any).options[0]}
@@ -50,17 +57,41 @@ export const ManagementSider = () => {
 				);
 			}
 
-			if (key === "WindowLevel") {
-				<Input />;
+			if (key === "Filter") {
+				return (
+					<Select className="management-sider__select" defaultValue={(options as any).options[0]}
+							onChange={value => dispatch(setFilter(value))} style={{ width: 120 }}>
+						{(options as any).options.map((o: string) => <Option key={o} value={o}>{o}</Option>)}
+					</Select>
+				);
 			}
 
 			return (
-				<Select className="management-sider__select" defaultValue={selectedTool} value={selectedTool}
-						onChange={e => dispatch(setSelectedTool(e))} style={{ width: 120 }}>
-
-				</Select>
+				<>
+					<Select className="management-sider__select" defaultValue={selectedTool} value={selectedTool}
+							onChange={e => dispatch(setSelectedTool(e))} style={{ width: 120 }}>
+					</Select>
+				</>
 			);
 		}
+
+		if (key === "WindowLevel") {
+			return <Select className="management-sider__select" style={{ width: 200 }} value={selectedWindowLevelMap}
+						   onChange={e => dispatch(setSelectedWindowLevelMap(e))}>
+				{[{ label: "Rainbow", value: "rainbow" }, { label: "Hot Iron", value: "hot_iron" }, {
+					label: "PET",
+					value: "pet"
+				}, {
+					label: "Hot Metal Blue",
+					value: "hot_metal_blue"
+				}, {
+					label: "PET 20 Steps",
+					value: "pet_20step"
+				}].map(({ value, label }) =>
+					<Option value={value}>{label} </Option>)}
+			</Select>;
+		}
+
 		return <></>;
 	};
 
@@ -138,6 +169,23 @@ export const ManagementSider = () => {
 					</Col>
 				</Row>
 
+				<Divider>Parameters</Divider>
+				<Row gutter={[24, 24]}>
+					<Col span={12}>
+						<Statistic className="management-sider__statistics" title="WC" value={windowLevel.center} />
+					</Col>
+					<Col span={12}>
+						<Statistic className="management-sider__statistics" title="WW" value={windowLevel.width} />
+					</Col>
+
+					<Col span={12}>
+						<Statistic className="management-sider__statistics" title="Zoom" value={zoom.toFixed(3)} />
+					</Col>
+					<Col span={12}>
+						<Statistic className="management-sider__statistics" title="Offset"
+								   value={`x: ${offset.x.toFixed(3)} y: ${offset.y.toFixed(3)}`} />
+					</Col>
+				</Row>
 				<Divider>Tools</Divider>
 				<Row gutter={[24, 24]}>
 					<Col span={12}>
@@ -152,8 +200,6 @@ export const ManagementSider = () => {
 					<Col span={4}>
 						<Button onClick={() => dispatch(undo())}>Undo</Button>
 					</Col>
-
-
 				</Row>
 			</div>
 		</Sider>

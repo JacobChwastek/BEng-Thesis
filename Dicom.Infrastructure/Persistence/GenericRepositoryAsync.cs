@@ -8,108 +8,103 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dicom.Infrastructure.Persistence
 {
-    public class GenericRepositoryAsync<TEntity> where TEntity : class, IEntity
+    public sealed class GenericRepositoryAsync<TEntity> where TEntity : class, IEntity
     {
-        internal Context context;
-        internal DbSet<TEntity> dbSet;
+        private Context _context;
+        private DbSet<TEntity> _dbSet;
         internal IUnitOfWork _unitOfWork;
 
-        protected GenericRepositoryAsync() { }
+        private GenericRepositoryAsync()
+        {
+        }
 
         public GenericRepositoryAsync(Context context)
         {
             SetContext(context);
         }
 
-        public void SetContext(Context context)   // a workaround for creating custom repos in DAL.cs
+        private void SetContext(Context context) // a workaround for creating custom repos in DAL.cs
         {
-            this.context = context;
-            this.dbSet = context.Set<TEntity>();
+            _context = context;
+            _dbSet = context.Set<TEntity>();
         }
 
 
-        public DbSet<TEntity> AllRecords => dbSet ??= context.Set<TEntity>();
+        public DbSet<TEntity> AllRecords => _dbSet ??= _context.Set<TEntity>();
 
         #region Get
-        public virtual async Task<TEntity> GetByIDAsync(Guid id, QueryTrackingBehavior behavior = QueryTrackingBehavior.TrackAll)
+
+        public async Task<TEntity> GetByIDAsync(Guid id, QueryTrackingBehavior behavior = QueryTrackingBehavior.TrackAll)
         {
             return behavior == QueryTrackingBehavior.TrackAll
-                ? await dbSet.FindAsync(id)
-                : await dbSet.AsNoTracking().SingleOrDefaultAsync(ent => ent.Id == id);
+                ? await _dbSet.FindAsync(id)
+                : await _dbSet.AsNoTracking().SingleOrDefaultAsync(ent => ent.Id == id);
         }
 
         public async Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> filter = null)
         {
-            if (filter is null)
-                filter = (x) => true;
+            filter ??= (x) => true;
 
-            return await dbSet.FirstOrDefaultAsync(filter);
+            return await _dbSet.FirstOrDefaultAsync(filter);
         }
 
         public async Task<TEntity> FirstAsync(Expression<Func<TEntity, bool>> filter = null)
         {
-            if (filter is null)
-                filter = (x) => true;
+            filter ??= (x) => true;
 
-            return await dbSet.FirstAsync(filter);
+            return await _dbSet.FirstAsync(filter);
         }
 
         public async Task<TEntity> SingleOrDefaultAsync(Expression<Func<TEntity, bool>> filter = null, QueryTrackingBehavior behavior = QueryTrackingBehavior.TrackAll)
         {
-            if (filter is null)
-                filter = (x) => true;
+            filter ??= (x) => true;
 
             if (behavior == QueryTrackingBehavior.TrackAll)
             {
-                return await dbSet.SingleOrDefaultAsync(filter);
+                return await _dbSet.SingleOrDefaultAsync(filter);
             }
-            else
-            {
-                return await dbSet.AsNoTracking().SingleOrDefaultAsync(filter);
-            }
+
+            return await _dbSet.AsNoTracking().SingleOrDefaultAsync(filter);
         }
-
-
 
 
         public IQueryable<TEntity> GetAllQueryable()
         {
-            var result = dbSet.AsQueryable();
+            var result = _dbSet.AsQueryable();
             return result.AsQueryable();
         }
 
         public async Task<TEntity> GetSingleWithRelationsAsync(Expression<Func<TEntity, bool>> filter = null, string relations = "")
         {
-            if (filter is null)
-                filter = (x) => true;
+            filter ??= (x) => true;
 
-            return await dbSet.Where(filter).Include(relations).FirstOrDefaultAsync();
+            return await _dbSet.Where(filter).Include(relations).FirstOrDefaultAsync();
         }
 
         public async Task<List<TEntity>> GetAllWithRelationsAsync(Expression<Func<TEntity, bool>> filter = null, string relation = "")
         {
-            if (filter is null)
-                filter = (x) => true;
+            filter ??= (x) => true;
 
-            return await dbSet.Where(filter).Include(relation).ToListAsync();
+            return await _dbSet.Where(filter).Include(relation).ToListAsync();
         }
 
-        public virtual IQueryable<TEntity> GetQuerable(Expression<Func<TEntity, bool>> filter = null)
+        public IQueryable<TEntity> GetQuerable(Expression<Func<TEntity, bool>> filter = null)
         {
-            IQueryable<TEntity> query = dbSet;
+            IQueryable<TEntity> query = _dbSet;
             if (filter != null)
             {
                 query = query.Where(filter);
             }
+
             return query;
         }
 
-        public virtual async Task<IEnumerable<TEntity>> GetAsync(
+        public async Task<IEnumerable<TEntity>> GetAsync(
             Expression<Func<TEntity, bool>> filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy = null,
             string includeProperties = "", QueryTrackingBehavior behavior = QueryTrackingBehavior.TrackAll)
         {
-            IQueryable<TEntity> query = dbSet;
+            IQueryable<TEntity> query = _dbSet;
 
             if (filter != null)
             {
@@ -117,7 +112,7 @@ namespace Dicom.Infrastructure.Persistence
             }
 
             foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                         (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 query = query.Include(includeProperty);
             }
@@ -138,9 +133,8 @@ namespace Dicom.Infrastructure.Persistence
         public async Task<List<TEntity>> GetAllAsync(Expression<Func<TEntity, bool>> filter = null)
         {
             if (filter != null)
-                return await dbSet.Where(filter).ToListAsync();
-            else
-                return await dbSet.ToListAsync();
+                return await _dbSet.Where(filter).ToListAsync();
+            return await _dbSet.ToListAsync();
         }
 
         #endregion
@@ -149,33 +143,34 @@ namespace Dicom.Infrastructure.Persistence
 
         public Guid? Update(IEntity entity)
         {
-            var updatedEntityId = dbSet.Update(entity as TEntity).Entity.Id;
+            var updatedEntityId = _dbSet.Update(entity as TEntity).Entity.Id;
             return updatedEntityId;
         }
 
-        public virtual void DetachIfAlreadyAttached(TEntity entity)
+        public void DetachIfAlreadyAttached(TEntity entity)
         {
-            var alreadyAttachedEntity = dbSet.Local.SingleOrDefault(e => e.Id == entity.Id);
+            var alreadyAttachedEntity = _dbSet.Local.SingleOrDefault(e => e.Id == entity.Id);
 
             if (alreadyAttachedEntity != null)
             {
-                context.Entry(alreadyAttachedEntity).State = EntityState.Detached;
+                _context.Entry(alreadyAttachedEntity).State = EntityState.Detached;
             }
         }
 
-        public virtual void Update(TEntity entityToUpdate)
+        public void Update(TEntity entityToUpdate)
         {
             DetachIfAlreadyAttached(entityToUpdate);
-            dbSet.Attach(entityToUpdate);   // attach new entity
-            context.Entry(entityToUpdate).State = EntityState.Modified;
+            _dbSet.Attach(entityToUpdate); // attach new entity
+            _context.Entry(entityToUpdate).State = EntityState.Modified;
         }
 
         #endregion
 
         #region Insert
+
         public async Task<Guid?> InsertAsync(TEntity entity)
         {
-            var entityEntry = await dbSet.AddAsync(entity);
+            var entityEntry = await _dbSet.AddAsync(entity);
 
             if (entityEntry == null)
                 throw new Exception("Failed to insert entity, dbSet.Add returned null");
@@ -186,21 +181,21 @@ namespace Dicom.Infrastructure.Persistence
 
         public async Task<Guid?> InsertAsync(IEntity entity)
         {
-            var newEntity = await dbSet.AddAsync(entity as TEntity);
+            var newEntity = await _dbSet.AddAsync(entity as TEntity);
 
             return newEntity.Entity.Id;
         }
 
-        public virtual void InsertAll(IEnumerable<TEntity> entities)
+        public void InsertAll(IEnumerable<TEntity> entities)
         {
-            dbSet.AddRange(entities);
+            _dbSet.AddRange(entities);
         }
 
         public bool Any(Expression<Func<TEntity, bool>> filter = null)
         {
             filter ??= (x) => true;
 
-            return dbSet.AsNoTracking().Where(filter).Any();
+            return _dbSet.AsNoTracking().Where(filter).Any();
         }
 
 
@@ -220,25 +215,27 @@ namespace Dicom.Infrastructure.Persistence
 
         #region Delete
 
-        public virtual async Task DeleteById(Guid id)
+        public async Task DeleteById(Guid id)
         {
-            var entityToDelete = await dbSet.FindAsync(id);
+            var entityToDelete = await _dbSet.FindAsync(id);
             Delete(entityToDelete);
         }
-        public virtual void Delete(TEntity entityToDelete)
+
+        public void Delete(TEntity entityToDelete)
         {
-            if (context.Entry(entityToDelete).State == EntityState.Detached)
+            if (_context.Entry(entityToDelete).State == EntityState.Detached)
             {
-                dbSet.Attach(entityToDelete);
+                _dbSet.Attach(entityToDelete);
             }
-            dbSet.Remove(entityToDelete);
+
+            _dbSet.Remove(entityToDelete);
         }
 
         #endregion
 
         public async Task<int> SaveChangesAsync()
         {
-            return await this.context.SaveChangesAsync();
+            return await _context.SaveChangesAsync();
         }
     }
 }

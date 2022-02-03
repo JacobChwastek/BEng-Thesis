@@ -1,3 +1,8 @@
+export interface IExtenedTool {
+	options: string[],
+	type: string,
+	events: string[],
+}
 export interface IDicomState {
 	dwv: {
 		versions: {
@@ -7,19 +12,30 @@ export interface IDicomState {
 		tools: {
 			Opacity: {},
 			Livewire: {},
-			Filter: {},
+			Filter: IExtenedTool,
 			Floodfill: {},
 			Scroll: {},
 			ZoomAndPan: {},
 			WindowLevel: {},
-			Draw: {
-				options: string[],
-				type: string,
-				events: string[],
+			Draw: IExtenedTool
+		},
+		parameters: {
+			opacity: number,
+			zoom: number,
+			windowLevel: {
+				center: number,
+				width: number
 			}
+			offset: {
+				x: number,
+				y: number
+			},
+
 		},
 		toolNames: string[],
 		selectedTool: string,
+		selectedWindowLevelMap: string,
+		selectedFilter: string,
 		loadProgress: number,
 		dataLoaded: boolean,
 		metaData: IMetaData[],

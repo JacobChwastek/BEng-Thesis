@@ -23,7 +23,7 @@ export const Tools = ({
 					  }: Props) => {
 
 	return (
-		<div className="button-row">
+		<div className="button-row" style={{ visibility: "hidden" }}>
 			<Button variant="contained" color="primary"
 
 					aria-haspopup="true"

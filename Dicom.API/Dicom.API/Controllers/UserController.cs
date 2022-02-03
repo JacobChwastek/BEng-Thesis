@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -6,6 +7,8 @@ using Dicom.API.Extensions;
 using Dicom.Application.Commands.CreateUser;
 using Dicom.Application.Commands.Login;
 using Dicom.Application.Queries;
+using Dicom.Application.Services;
+using Dicom.Entity.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 
@@ -15,6 +18,15 @@ namespace Dicom.API.Controllers
     [ApiController]
     public class UserController : ApiController
     {
+        private readonly IUserService _userService;
+
+        public UserController(IUserService userService)
+        {
+            _userService = userService;
+        }
+
+        public async Task<IEnumerable<User>> GetUsers() => await _userService.GetUsers();
+
         [HttpPost("register")]
         public async Task<IActionResult> CreateUserAsync([FromBody] CreateUserCommand createUser)
         {

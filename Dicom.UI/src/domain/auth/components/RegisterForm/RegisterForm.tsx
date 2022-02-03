@@ -51,7 +51,7 @@ export const RegisterForm = ({ loginPageUrl }: Props) => {
 				autoComplete="off"
 			>
 				<Form.Item className="login__item" name="username" rules={[{ required: true, message: "Please input your username!" }]}>
-					<Input prefix={<UserOutlined />} label="Login" type="outline" />
+					<Input prefix={<UserOutlined />} label="Email" type="outline" />
 				</Form.Item>
 
 				<Form.Item className="login__item" name="password" rules={[{ required: true, message: "Please input your password!" }]}>
